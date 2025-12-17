@@ -3,35 +3,42 @@ import api from "../../services/api";
 
 function Produtos() {
   const [produtos, setProdutos] = useState([]);
-  const [usuarios, setUsuarios] = useState([]); // Necessário para selecionar o vendedor
+  const [usuarios, setUsuarios] = useState([]);
   const [nome, setNome] = useState("");
   const [preco, setPreco] = useState("");
   const [estoque, setEstoque] = useState("");
   const [idVendedor, setIdVendedor] = useState("");
   const [editandoId, setEditandoId] = useState(null);
 
-  // 1. Carregar Dados (Produtos e Utilizadores para o Select)
-  const carregarDados = async () => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [resProdutos, resUsuarios] = await Promise.all([
+          api.get("/produtos"),
+          api.get("/usuarios"),
+        ]);
+        setProdutos(resProdutos.data);
+        setUsuarios(resUsuarios.data);
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const recarregarProdutos = async () => {
     try {
-      const [resProdutos, resUsuarios] = await Promise.all([
-        api.get("/produtos"),
-        api.get("/usuarios"),
-      ]);
-      setProdutos(resProdutos.data);
-      setUsuarios(resUsuarios.data);
+      const response = await api.get("/produtos");
+      setProdutos(response.data);
     } catch (error) {
-      console.error("Erro ao carregar dados:", error);
+      console.error("Erro ao recarregar produtos:", error);
     }
   };
 
-  useEffect(() => {
-    carregarDados();
-  }, []);
-
-  // 2. Criar ou Atualizar Produto
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const dadosProduto = {
+    const dados = {
       nome,
       preco: parseFloat(preco),
       estoque: parseInt(estoque),
@@ -40,37 +47,36 @@ function Produtos() {
 
     try {
       if (editandoId) {
-        await api.put(`/produtos/${editandoId}`, dadosProduto);
-        alert("Produto atualizado!");
+        await api.put(`/produtos/${editandoId}`, dados);
+        alert("Produto atualizado com sucesso!");
       } else {
-        await api.post("/produtos", dadosProduto); // Verifique se a rota no routes.js é /produtos ou /produtoss
-        alert("Produto cadastrado!");
+        await api.post("/produtoss", dados);
+        alert("Produto cadastrado com sucesso!");
       }
       limparFormulario();
-      carregarDados();
+      recarregarProdutos();
     } catch (error) {
-      alert(error.response?.data?.error || "Erro na operação");
+      alert(error.response?.data?.error || "Erro ao salvar produto");
     }
   };
 
-  // 3. Eliminar Produto
   const handleDeletar = async (id) => {
-    if (window.confirm("Deseja remover este produto?")) {
+    if (window.confirm("Tem certeza que deseja excluir este produto?")) {
       try {
         await api.delete(`/produtos/${id}`);
-        carregarDados();
+        recarregarProdutos();
       } catch (error) {
-        alert(error.response?.data?.error || "Erro ao eliminar");
+        alert(error.response?.data?.error || "Erro ao deletar");
       }
     }
   };
 
-  const prepararEdicao = (prod) => {
-    setEditandoId(prod.id);
-    setNome(prod.nome);
-    setPreco(prod.preco);
-    setEstoque(prod.estoque);
-    setIdVendedor(prod.id_usuario_vendedor);
+  const prepararEdicao = (produto) => {
+    setEditandoId(produto.id);
+    setNome(produto.nome);
+    setPreco(produto.preco);
+    setEstoque(produto.estoque);
+    setIdVendedor(produto.id_usuario_vendedor);
   };
 
   const limparFormulario = () => {
@@ -88,7 +94,7 @@ function Produtos() {
       <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
         <input
           type="text"
-          placeholder="Nome do Produto"
+          placeholder="Nome"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
@@ -113,7 +119,7 @@ function Produtos() {
           value={idVendedor}
           onChange={(e) => setIdVendedor(e.target.value)}
           required
-          disabled={editandoId}
+          disabled={!!editandoId}
         >
           <option value="">Selecione o Vendedor</option>
           {usuarios.map((u) => (
@@ -123,9 +129,11 @@ function Produtos() {
           ))}
         </select>
 
-        <button type="submit">{editandoId ? "Atualizar" : "Anunciar"}</button>
+        <button type="submit">
+          {editandoId ? "Atualizar Produto" : "Cadastrar Produto"}
+        </button>
         {editandoId && (
-          <button onClick={limparFormulario} type="button">
+          <button type="button" onClick={limparFormulario}>
             Cancelar
           </button>
         )}
@@ -135,9 +143,9 @@ function Produtos() {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Produto</th>
+            <th>Nome</th>
             <th>Preço</th>
-            <th>Stock</th>
+            <th>Estoque</th>
             <th>Vendedor (ID)</th>
             <th>Ações</th>
           </tr>
@@ -147,12 +155,12 @@ function Produtos() {
             <tr key={p.id}>
               <td>{p.id}</td>
               <td>{p.nome}</td>
-              <td>€ {p.preco.toFixed(2)}</td>
+              <td>R$ {p.preco.toFixed(2)}</td>
               <td>{p.estoque}</td>
               <td>{p.id_usuario_vendedor}</td>
               <td>
                 <button onClick={() => prepararEdicao(p)}>Editar</button>
-                <button onClick={() => handleDeletar(p.id)}>Eliminar</button>
+                <button onClick={() => handleDeletar(p.id)}>Excluir</button>
               </td>
             </tr>
           ))}
