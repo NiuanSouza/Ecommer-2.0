@@ -1,7 +1,7 @@
 const db = require("../database/connection");
 
 module.exports = {
-  // Listar todos os usuários (Select)
+  // Listar todos os usuários git(Select)
   async index(req, res) {
     db.all("SELECT * FROM Usuario", (err, rows) => {
       if (err) return res.status(500).json({ error: err.message });
