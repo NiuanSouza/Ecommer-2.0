@@ -4,8 +4,13 @@ module.exports = {
   // Listar histórico geral (Read)
   index(req, res) {
     const sql = `
-            SELECT C.id, C.data_compra, C.quantidade, 
-                   U.nome as comprador, P.nome as produto, (C.quantidade * P.preco) as total
+            SELECT C.id, 
+                   C.data_compra, 
+                   C.quantidade, 
+                   C.id_usuario_comprador, -- Adicione esta linha aqui
+                   U.nome as comprador, 
+                   P.nome as produto, 
+                   (C.quantidade * P.preco) as total
             FROM Compra C
             JOIN Usuario U ON C.id_usuario_comprador = U.id
             JOIN Produto P ON C.id_produto = P.id
