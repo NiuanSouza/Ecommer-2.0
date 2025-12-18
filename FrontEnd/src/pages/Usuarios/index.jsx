@@ -16,9 +16,8 @@ function Usuarios() {
     }
   };
 
-  // 2. Executa ao abrir a página
   useEffect(() => {
-    let montado = true; // Flag para evitar atualizar estado se o componente for desmontado
+    let montado = true;
 
     const fetchUsers = async () => {
       try {
@@ -35,19 +34,16 @@ function Usuarios() {
 
     return () => {
       montado = false;
-    }; // Função de limpeza
+    };
   }, []);
 
-  // Função para Criar ou Atualizar (Create/Update)
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editandoId) {
-        // Rota PUT definida no BackEnd
         await api.put(`/usuarios/${editandoId}`, { nome, email });
         alert("Utilizador atualizado!");
       } else {
-        // Rota POST definida no BackEnd
         await api.post("/usuarios", { nome, email });
         alert("Utilizador cadastrado!");
       }
@@ -59,15 +55,12 @@ function Usuarios() {
     }
   };
 
-  // Função para Deletar (Delete)
   const handleDeletar = async (id) => {
     if (window.confirm("Tem a certeza que deseja remover este utilizador?")) {
       try {
-        // Rota DELETE definida no BackEnd
         await api.delete(`/usuarios/${id}`);
         carregarUsuarios();
       } catch (error) {
-        // O BackEnd bloqueia se houver produtos vinculados
         alert(error.response?.data?.error || "Erro ao deletar");
       }
     }
@@ -124,8 +117,18 @@ function Usuarios() {
               <td>{user.nome}</td>
               <td>{user.email}</td>
               <td>
-                <button onClick={() => prepararEdicao(user)}>Editar</button>
-                <button onClick={() => handleDeletar(user.id)}>Excluir</button>
+                <button
+                  className="btn-edit"
+                  onClick={() => prepararEdicao(user)}
+                >
+                  Editar
+                </button>
+                <button
+                  className="btn-delete"
+                  onClick={() => handleDeletar(user.id)}
+                >
+                  Excluir
+                </button>
               </td>
             </tr>
           ))}

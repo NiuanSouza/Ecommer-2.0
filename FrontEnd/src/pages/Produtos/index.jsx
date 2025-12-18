@@ -159,8 +159,15 @@ function Produtos() {
               <td>{p.estoque}</td>
               <td>{p.id_usuario_vendedor}</td>
               <td>
-                <button onClick={() => prepararEdicao(p)}>Editar</button>
-                <button onClick={() => handleDeletar(p.id)}>Excluir</button>
+                <button className="btn-edit" onClick={() => prepararEdicao(p)}>
+                  Editar
+                </button>
+                <button
+                  className="btn-delete"
+                  onClick={() => handleDeletar(p.id)}
+                >
+                  Excluir
+                </button>
               </td>
             </tr>
           ))}
