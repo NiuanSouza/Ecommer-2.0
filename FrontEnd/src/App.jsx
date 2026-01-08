@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Usuarios from "./pages/Usuarios";
-import Produtos from "./pages/Produtos";
-import Compras from "./pages/Compras";
+import Usuarios from "./pages/admin/Usuarios";
+import Produtos from "./pages/admin/Produtos";
+import Compras from "./pages/admin/Compras";
 import HomePortal from "./HomePortal.jsx";
 import ClientePortal from "./pages/ClientePortal";
 import VendedorPortal from "./pages/VendedorPortal";

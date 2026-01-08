@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import api from "../../services/api";
+import api from "../../../services/api";
+import Historico from "./Historico";
+import Cadastro from "./Cadastro";
 
 function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
@@ -82,58 +84,26 @@ function Usuarios() {
     <div>
       <h2>Gestão de Utilizadores</h2>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          placeholder="Nome"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          required
-        />
-        <input
-          type="email"
-          placeholder="E-mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <button type="submit">{editandoId ? "Atualizar" : "Cadastrar"}</button>
-        {editandoId && <button onClick={limparFormulario}>Cancelar</button>}
-      </form>
-
-      <table border="1" style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>E-mail</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {usuarios.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.nome}</td>
-              <td>{user.email}</td>
-              <td>
-                <button
-                  className="btn-edit"
-                  onClick={() => prepararEdicao(user)}
-                >
-                  Editar
-                </button>
-                <button
-                  className="btn-delete"
-                  onClick={() => handleDeletar(user.id)}
-                >
-                  Excluir
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Cadastro
+        usuarios={usuarios}
+        handleSubmit={handleSubmit}
+        nome={nome}
+        setNome={setNome}
+        email={email}
+        setEmail={setEmail}
+        prepararEdicao={prepararEdicao}
+        handleDeletar={handleDeletar}
+      />
+      <Historico
+        handleSubmit={handleSubmit}
+        nome={nome}
+        setNome={setNome}
+        email={email}
+        setEmail={setEmail}
+        usuarios={usuarios}
+        editandoId={editandoId}
+        limparFormulario={limparFormulario}
+      />
     </div>
   );
 }
