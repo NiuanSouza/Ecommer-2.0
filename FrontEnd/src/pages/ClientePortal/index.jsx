@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import api from "../../services/api";
 
-function ClientePortal() {
+function ClientePortal({ busca, setBusca }) {
   const [produtos, setProdutos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [compras, setCompras] = useState([]);
   const [idUsuarioLogado, setIdUsuarioLogado] = useState("");
-  const [busca, setBusca] = useState("");
   const [quantidades, setQuantidades] = useState({});
 
   const buscarHistorico = useCallback(async (userId) => {
@@ -95,12 +94,6 @@ function ClientePortal() {
       </div>
 
       <section className="vitrine">
-        <input
-          placeholder="Pesquisar produto..."
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
-        />
         <div className="card-grid">
           {produtosDisponiveis.map((p) => (
             <div key={p.id} className="portal-card">

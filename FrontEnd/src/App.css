@@ -1,118 +1,170 @@
-.container {
+:root {
+  --primary: #2d3436; /* Cor Principal */
+  --secondary: #0984e3; /* Cor dos Botões/Busca */
+  --white: #ffffff;
+  --bg-body: #f5f6fa;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-body);
+  font-family: "Segoe UI", sans-serif;
+}
+
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.container-header {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-}
-
-nav {
-  background-color: var(--primary);
-  padding: 1rem 2rem;
+  padding: 0 15px;
   display: flex;
-  gap: 15px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-nav button {
-  background: transparent;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 8px 16px;
-  cursor: pointer;
-  border-radius: 4px;
-  font-weight: 500;
-  transition: all 0.3s;
-}
-
-nav button:hover {
-  background: var(--secondary);
-  border-color: var(--secondary);
-}
-
-h2 {
-  color: var(--primary);
-  margin-bottom: 20px;
-  border-left: 5px solid var(--accent);
-  padding-left: 15px;
-}
-
-table {
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
-  border-collapse: collapse;
-  background: var(--white);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  margin-top: 20px;
 }
 
-th {
-  background-color: var(--secondary);
-  color: white;
-  text-align: left;
-  padding: 12px 15px;
-  font-weight: 600;
-}
-
-td {
-  padding: 12px 15px;
-  border-bottom: 1px solid #eee;
-}
-
-tr:hover {
-  background-color: #f9f9f9;
-}
-
-form {
-  background: var(--white);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+.header-topbar {
+  height: 35px;
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 12px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
   align-items: center;
 }
 
-input,
-select {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  outline: none;
+.topbar-links {
+  display: flex;
+  gap: 15px;
 }
 
-input:focus,
-select:focus {
-  border-color: var(--secondary);
-}
-
-button[type="submit"] {
-  background-color: var(--success);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
+.topbar-link {
   cursor: pointer;
+  opacity: 0.8;
+  transition: 0.2s;
 }
 
-button[type="submit"]:hover {
-  filter: brightness(1.1);
+.topbar-link:hover {
+  opacity: 1;
 }
 
-.btn-edit {
+.header-main {
+  padding: 10px 0;
+  min-height: 75px;
+  display: flex;
+  align-items: center;
+}
+
+.logo-brand {
+  height: 40px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.search-container {
+  flex: 1;
+  max-width: 600px;
+  height: 40px;
+  background: var(--white);
+  margin: 0 20px;
+  display: flex;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.search-input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: normal;
+}
+
+.search-container:focus-within {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 2px rgba(9, 132, 227, 0.1);
+}
+
+.search-btn {
+  background: var(--secondary);
+  border: none;
+  width: 50px;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .container-header {
+    flex-wrap: wrap;
+  }
+
+  .search-container {
+    order: 3;
+    width: 100%;
+    margin: 10px 0 0 0;
+    max-width: none;
+  }
+
+  .hide-mobile {
+    display: none;
+  }
+
+  .app-wrapper {
+    margin-top: 150px;
+  }
+}
+
+@media (min-width: 769px) {
+  .app-wrapper {
+    margin-top: 130px;
+  }
+}
+
+.app-wrapper {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+}
+
+.content-card {
+  background: var(--white);
+  padding: 20px;
+  border-radius: 8px;
+  min-height: 400px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.internal-nav {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.internal-nav button {
+  padding: 8px 16px;
+  cursor: pointer;
   background: var(--secondary);
   color: white;
-  margin-right: 5px;
-}
-.btn-delete {
-  background: var(--danger);
-  color: white;
-}
-
-button {
-  padding: 5px 10px;
   border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 0.9rem;
+  border-radius: 4px;
 }

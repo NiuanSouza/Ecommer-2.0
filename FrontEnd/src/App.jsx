@@ -1,91 +1,107 @@
 import React, { useState } from "react";
+import logoEcommerce from "./assets/ecommerce.png";
+
 import Usuarios from "./pages/admin/Usuarios";
 import Produtos from "./pages/admin/Produtos";
 import Compras from "./pages/admin/Compras";
-import HomePortal from "./HomePortal.jsx";
 import ClientePortal from "./pages/ClientePortal";
 import VendedorPortal from "./pages/VendedorPortal";
-import logoEcommerce from "./assets/ecommerce.png";
 
 import "./App.css";
 
 function App() {
-  const [portal, setPortal] = useState("home");
-
+  const [portal, setPortal] = useState("cliente");
   const [pagina, setPagina] = useState("usuarios");
+  const [busca, setBusca] = useState("");
 
   return (
-    <div className="app-wrapper">
-      <nav>
-        <img
-          id="ecommercePhoto"
-          src={logoEcommerce}
-          alt="Logo"
-          onClick={() => {
-            setPortal("home");
-            setPagina("");
-          }}
-        />
+    <div className="app-container">
+      <header className="main-header">
+        <section className="header-topbar">
+          <div className="container-header">
+            <div className="topbar-links">
+              <span onClick={() => setPortal("admin")} className="topbar-link">
+                Admin
+              </span>
+              <span
+                onClick={() => setPortal("vendedor")}
+                className="topbar-link"
+              >
+                Vendedor
+              </span>
+              <span
+                onClick={() => setPortal("cliente")}
+                className="topbar-link"
+              >
+                Minhas Compras
+              </span>
+            </div>
+            <div className="topbar-links hide-mobile"></div>
+          </div>
+        </section>
 
-        {}
-        {portal === "admin" && (
-          <>
-            <button
-              className={pagina === "usuarios" ? "active" : ""}
-              onClick={() => setPagina("usuarios")}
+        <section className="header-main">
+          <div className="container-header">
+            <form
+              className="search-container"
+              onSubmit={(e) => e.preventDefault()}
             >
-              Usuários
-            </button>
-            <button
-              className={pagina === "produtos" ? "active" : ""}
-              onClick={() => setPagina("produtos")}
-            >
-              Produtos
-            </button>
-            <button
-              className={pagina === "compras" ? "active" : ""}
-              onClick={() => setPagina("compras")}
-            >
-              Compras
-            </button>
-          </>
-        )}
+              <input
+                type="text"
+                className="search-input"
+                placeholder="O que você procura?"
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+              />
+              <button className="search-btn" type="submit">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  stroke="white"
+                  strokeWidth="2"
+                  fill="none"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </button>
+            </form>
 
-        {}
-        {portal !== "home" && (
-          <button
-            className="btn-delete"
-            onClick={() => setPortal("home")}
-            style={{ marginLeft: "auto" }}
-          >
-            Sair do Portal
-          </button>
-        )}
-      </nav>
+            <div className="header-actions">
+              <div className="cart-icon"></div>
+              <img
+                src={logoEcommerce}
+                className="logo-brand"
+                alt="Logo"
+                onClick={() => setPortal("home")}
+              />
+            </div>
+          </div>
+        </section>
+      </header>
 
-      <main className="container">
-        {}
-        {portal === "home" && (
-          <HomePortal
-            onSelectPortal={(p) => {
-              setPortal(p);
-              if (p === "admin") setPagina("usuarios");
-              if (p === "cliente") setPagina("vitrine");
-            }}
-          />
-        )}
+      <main className="app-wrapper">
+        <div className="content-card">
+          {portal === "home" && (
+            <ClientePortal busca={"busca"} setBusca={"setBusca"} />
+          )}
 
-        {portal === "admin" && (
-          <>
-            {pagina === "usuarios" && <Usuarios />}
-            {pagina === "produtos" && <Produtos />}
-            {pagina === "compras" && <Compras />}
-          </>
-        )}
+          {portal === "admin" && (
+            <div className="admin-section">
+              <nav className="internal-nav">
+                <button onClick={() => setPagina("usuarios")}>Usuários</button>
+                <button onClick={() => setPagina("produtos")}>Produtos</button>
+              </nav>
+              {pagina === "usuarios" ? <Usuarios /> : <Produtos />}
+            </div>
+          )}
 
-        {}
-        {portal === "cliente" && <ClientePortal />}
-        {portal === "vendedor" && <VendedorPortal />}
+          {portal === "vendedor" && <VendedorPortal />}
+          {portal === "cliente" && (
+            <ClientePortal busca={"busca"} setBusca={"setBusca"} />
+          )}
+        </div>
       </main>
     </div>
   );
