@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import logoEcommerce from "./assets/ecommerce.png";
+import logoEcommerce from "./assets/home.png";
+import CartEcommerce from "./assets/ecommerce.png";
 
 import Usuarios from "./pages/admin/Usuarios";
 import Produtos from "./pages/admin/Produtos";
-import ClientePortal from "./pages/ClientePortal";
+import ClientePortal from "./pages/Products.jsx";
 import VendedorPortal from "./pages/VendedorPortal";
 
 import "./App.css";
@@ -46,6 +47,13 @@ function App() {
 
         <section className="header-main">
           <div className="container-header">
+            <img
+              src={logoEcommerce}
+              className="logo-brand"
+              alt="Logo"
+              style={{ cursor: "pointer" }}
+              onClick={() => setPortal("home")}
+            />
             <form
               className="search-container"
               onSubmit={(e) => e.preventDefault()}
@@ -61,11 +69,11 @@ function App() {
 
             <div className="header-actions">
               <img
-                src={logoEcommerce}
+                src={CartEcommerce}
                 className="logo-brand"
                 alt="Logo"
                 style={{ cursor: "pointer" }}
-                onClick={() => setPortal("home")}
+                onClick={() => setPortal("cart")}
               />
 
               <div className="login-container">
@@ -162,6 +170,16 @@ function App() {
               busca={busca}
               setBusca={setBusca}
             />
+          )}
+
+          {portal === "cart" && (
+            <div className="admin-section">
+              <nav className="internal-nav">
+                <button onClick={() => setPagina("usuarios")}>Usuários</button>
+                <button onClick={() => setPagina("produtos")}>Produtos</button>
+              </nav>
+              {pagina === "usuarios" ? <Usuarios /> : <Produtos />}
+            </div>
           )}
         </div>
       </main>

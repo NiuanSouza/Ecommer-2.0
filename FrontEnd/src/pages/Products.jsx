@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import api from "../../services/api";
+import api from "../services/api";
+import Historic from "./ProductsHistoric";
 
 function ClientePortal({ busca, setUsuarios, idUsuarioLogado }) {
   const [produtos, setProdutos] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [compras, setCompras] = useState([]);
   const [quantidades, setQuantidades] = useState({});
 
@@ -84,10 +86,6 @@ function ClientePortal({ busca, setUsuarios, idUsuarioLogado }) {
 
   return (
     <div className="cliente-portal">
-      <div className="cliente-header" style={{ marginBottom: "20px" }}>
-        <h2>Portal do Cliente</h2>
-      </div>
-
       <section className="vitrine">
         <div className="card-grid">
           {produtosDisponiveis.map((p) => (
@@ -122,47 +120,7 @@ function ClientePortal({ busca, setUsuarios, idUsuarioLogado }) {
         </div>
       </section>
 
-      {idUsuarioLogado && (
-        <section style={{ marginTop: "40px" }}>
-          <hr />
-          <h3>Minhas Compras</h3>
-          <table style={{ width: "100%", textAlign: "left" }}>
-            <thead>
-              <tr>
-                <th>Produto</th>
-                <th>Qtd</th>
-                <th>Total</th>
-                <th>Data</th>
-              </tr>
-            </thead>
-            <tbody>
-              {compras.length > 0 ? (
-                compras.map((c) => (
-                  <tr key={c.id}>
-                    <td>{c.produto}</td>
-                    <td>{c.quantidade}</td>
-                    <td>R$ {Number(c.total || 0).toFixed(2)}</td>
-                    <td>
-                      {c.data_compra
-                        ? new Date(c.data_compra).toLocaleDateString()
-                        : "-"}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="4"
-                    style={{ textAlign: "center", padding: "10px" }}
-                  >
-                    Nenhuma compra encontrada.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </section>
-      )}
+      {/*<Historic idUsuarioLogado={idUsuarioLogado} compras={compras} />*/}
     </div>
   );
 }
