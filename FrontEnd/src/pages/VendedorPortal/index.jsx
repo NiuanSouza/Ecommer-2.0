@@ -1,60 +1,75 @@
 import React, { useState, useEffect, useCallback } from "react";
 import api from "../../services/api";
 
-function VendedorPortal() {
+function VendedorPortal({
+  busca = "",
+  setBusca,
+  setUsuarios,
+  idUsuarioLogado,
+}) {
   const [produtosVendedor, setProdutosVendedor] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
-  const [idVendedorLogado, setIdVendedorLogado] = useState("");
-  const [busca, setBusca] = useState("");
   const [novoProduto, setNovoProduto] = useState({
     nome: "",
     preco: "",
     estoque: "",
   });
 
+  // 1. Função memorizada para buscar produtos
   const carregarProdutosDoVendedor = useCallback(async (vendedorId) => {
-    if (!vendedorId) return;
+    if (!vendedorId) {
+      setProdutosVendedor([]);
+      return;
+    }
     try {
-      const res = await api.get(`/produtos?id_usuario_vendedor=${vendedorId}`);
-      setProdutosVendedor(res.data);
+      // Filtra os produtos onde o id_usuario_vendedor é o logado
+      const res = await api.get("/produtos");
+      const filtrados = res.data.filter(
+        (p) => Number(p.id_usuario_vendedor) === Number(vendedorId),
+      );
+      setProdutosVendedor(filtrados);
     } catch {
       console.error("Erro ao carregar produtos do vendedor");
     }
   }, []);
 
   useEffect(() => {
-    api.get("/usuarios").then((res) => setUsuarios(res.data));
-  }, []);
+    api
+      .get("/usuarios")
+      .then((res) => setUsuarios(res.data))
+      .catch(() => console.error("Erro ao carregar usuários"));
+  }, [setUsuarios]);
 
-  const handleUserChange = (e) => {
-    const id = e.target.value;
-    setIdVendedorLogado(id);
-    carregarProdutosDoVendedor(id);
-  };
+  useEffect(() => {
+    if (idUsuarioLogado) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      carregarProdutosDoVendedor(idUsuarioLogado);
+    }
+  }, [idUsuarioLogado, carregarProdutosDoVendedor]);
 
   const handleCadastrarProduto = async (e) => {
     e.preventDefault();
-    if (!idVendedorLogado) return alert("Selecione um vendedor primeiro!");
+    if (!idUsuarioLogado) return alert("Selecione um vendedor primeiro!");
 
     try {
       await api.post("/produtos", {
         nome: novoProduto.nome,
         preco: parseFloat(novoProduto.preco),
         estoque: parseInt(novoProduto.estoque),
-        id_usuario_vendedor: parseInt(idVendedorLogado),
+        id_usuario_vendedor: parseInt(idUsuarioLogado),
       });
 
       alert("Produto cadastrado com sucesso!");
       setNovoProduto({ nome: "", preco: "", estoque: "" });
 
-      carregarProdutosDoVendedor(idVendedorLogado);
+      // Recarrega a lista após cadastrar
+      carregarProdutosDoVendedor(idUsuarioLogado);
     } catch {
       alert("Erro ao cadastrar produto.");
     }
   };
 
   const produtosFiltrados = produtosVendedor.filter((p) =>
-    p.nome.toLowerCase().includes(busca.toLowerCase()),
+    (p.nome || "").toLowerCase().includes((busca || "").toLowerCase()),
   );
 
   return (
@@ -68,17 +83,9 @@ function VendedorPortal() {
         }}
       >
         <h2>Painel do Vendedor</h2>
-        <select value={idVendedorLogado} onChange={handleUserChange}>
-          <option value="">Entrar como Vendedor (Simular Login)</option>
-          {usuarios.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.nome}
-            </option>
-          ))}
-        </select>
       </div>
 
-      {idVendedorLogado && (
+      {idUsuarioLogado && (
         <>
           <section
             className="portal-card"
@@ -86,6 +93,7 @@ function VendedorPortal() {
               background: "#f9f9f9",
               padding: "20px",
               marginBottom: "30px",
+              borderRadius: "8px",
             }}
           >
             <h3>📦 Anunciar Novo Produto</h3>
@@ -105,17 +113,18 @@ function VendedorPortal() {
                   setNovoProduto({ ...novoProduto, nome: e.target.value })
                 }
                 required
-                style={{ flex: 2 }}
+                style={{ flex: 2, padding: "8px" }}
               />
               <input
                 type="number"
+                step="0.01"
                 placeholder="Preço R$"
                 value={novoProduto.preco}
                 onChange={(e) =>
                   setNovoProduto({ ...novoProduto, preco: e.target.value })
                 }
                 required
-                style={{ flex: 1 }}
+                style={{ flex: 1, padding: "8px" }}
               />
               <input
                 type="number"
@@ -125,7 +134,7 @@ function VendedorPortal() {
                   setNovoProduto({ ...novoProduto, estoque: e.target.value })
                 }
                 required
-                style={{ flex: 1 }}
+                style={{ flex: 1, padding: "8px" }}
               />
               <button type="submit" className="btn-edit" style={{ flex: 1 }}>
                 Anunciar
@@ -139,7 +148,13 @@ function VendedorPortal() {
               placeholder="Pesquisar entre meus anúncios..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginBottom: "20px",
+                borderRadius: "4px",
+                border: "1px solid #ddd",
+              }}
             />
 
             <div className="card-grid">
@@ -151,7 +166,7 @@ function VendedorPortal() {
                       className="price"
                       style={{ color: "var(--secondary)", fontWeight: "bold" }}
                     >
-                      R$ {Number(p.preco).toFixed(2)}
+                      R$ {Number(p.preco || 0).toFixed(2)}
                     </p>
                     <p>
                       <small>Em estoque: {p.estoque} unidades</small>
@@ -164,9 +179,10 @@ function VendedorPortal() {
                     textAlign: "center",
                     gridColumn: "1 / -1",
                     padding: "20px",
+                    color: "#666",
                   }}
                 >
-                  Você ainda não possui produtos cadastrados.
+                  Nenhum produto encontrado.
                 </p>
               )}
             </div>

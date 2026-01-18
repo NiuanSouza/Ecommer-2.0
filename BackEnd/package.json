@@ -9,7 +9,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.2.1",
@@ -17,5 +16,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
-  }
+  },
+  "description": ""
 }

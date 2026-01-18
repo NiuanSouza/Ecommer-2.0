@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import api from "../../services/api";
 
-function ClientePortal({ busca, setBusca }) {
+function ClientePortal({ busca, setUsuarios, idUsuarioLogado }) {
   const [produtos, setProdutos] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
   const [compras, setCompras] = useState([]);
-  const [idUsuarioLogado, setIdUsuarioLogado] = useState("");
   const [quantidades, setQuantidades] = useState({});
 
   const buscarHistorico = useCallback(async (userId) => {
@@ -25,26 +23,35 @@ function ClientePortal({ busca, setBusca }) {
   }, []);
 
   useEffect(() => {
+    let active = true;
     async function carregarDadosBase() {
       try {
         const [resProd, resUser] = await Promise.all([
           api.get("/produtos"),
           api.get("/usuarios"),
         ]);
-        setProdutos(resProd.data);
-        setUsuarios(resUser.data);
+        if (active) {
+          setProdutos(resProd.data);
+          setUsuarios(resUser.data);
+        }
       } catch {
         console.error("Erro ao carregar dados iniciais");
       }
     }
     carregarDadosBase();
-  }, []);
+    return () => {
+      active = false;
+    };
+  }, [setUsuarios]);
 
-  const handleUserChange = (e) => {
-    const novoId = e.target.value;
-    setIdUsuarioLogado(novoId);
-    buscarHistorico(novoId);
-  };
+  useEffect(() => {
+    if (idUsuarioLogado) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      buscarHistorico(idUsuarioLogado);
+    } else {
+      setCompras([]);
+    }
+  }, [idUsuarioLogado, buscarHistorico]);
 
   const handleComprar = async (produto) => {
     const qtd = parseInt(quantidades[produto.id] || 1);
@@ -62,35 +69,23 @@ function ClientePortal({ busca, setBusca }) {
 
       const resProd = await api.get("/produtos");
       setProdutos(resProd.data);
-      buscarHistorico(idUsuarioLogado);
+
+      await buscarHistorico(idUsuarioLogado);
     } catch {
       alert("Erro na compra.");
     }
   };
 
   const produtosDisponiveis = produtos.filter(
-    (p) => p.nome.toLowerCase().includes(busca.toLowerCase()) && p.estoque > 0,
+    (p) =>
+      (p.nome || "").toLowerCase().includes((busca || "").toLowerCase()) &&
+      p.estoque > 0,
   );
 
   return (
     <div className="cliente-portal">
-      <div
-        className="cliente-header"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "20px",
-        }}
-      >
+      <div className="cliente-header" style={{ marginBottom: "20px" }}>
         <h2>Portal do Cliente</h2>
-        <select value={idUsuarioLogado} onChange={handleUserChange}>
-          <option value="">Simular Login</option>
-          {usuarios.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.nome}
-            </option>
-          ))}
-        </select>
       </div>
 
       <section className="vitrine">
@@ -102,7 +97,7 @@ function ClientePortal({ busca, setBusca }) {
                 className="price"
                 style={{ color: "var(--secondary)", fontWeight: "bold" }}
               >
-                R$ {p.preco.toFixed(2)}
+                R$ {Number(p.preco || 0).toFixed(2)}
               </p>
               <p>
                 <small>Estoque: {p.estoque}</small>
@@ -146,8 +141,12 @@ function ClientePortal({ busca, setBusca }) {
                   <tr key={c.id}>
                     <td>{c.produto}</td>
                     <td>{c.quantidade}</td>
-                    <td>R$ {Number(c.total).toFixed(2)}</td>
-                    <td>{new Date(c.data_compra).toLocaleDateString()}</td>
+                    <td>R$ {Number(c.total || 0).toFixed(2)}</td>
+                    <td>
+                      {c.data_compra
+                        ? new Date(c.data_compra).toLocaleDateString()
+                        : "-"}
+                    </td>
                   </tr>
                 ))
               ) : (

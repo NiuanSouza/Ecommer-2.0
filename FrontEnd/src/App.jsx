@@ -3,7 +3,6 @@ import logoEcommerce from "./assets/ecommerce.png";
 
 import Usuarios from "./pages/admin/Usuarios";
 import Produtos from "./pages/admin/Produtos";
-import Compras from "./pages/admin/Compras";
 import ClientePortal from "./pages/ClientePortal";
 import VendedorPortal from "./pages/VendedorPortal";
 
@@ -13,6 +12,12 @@ function App() {
   const [portal, setPortal] = useState("cliente");
   const [pagina, setPagina] = useState("usuarios");
   const [busca, setBusca] = useState("");
+  const [usuarios, setUsuarios] = useState([]);
+  const [idUsuarioLogado, setIdUsuarioLogado] = useState("");
+  const [dropdownAberto, setDropdownAberto] = useState(false);
+  const usuarioLogado = usuarios.find(
+    (u) => String(u.id) === String(idUsuarioLogado),
+  );
 
   return (
     <div className="app-container">
@@ -36,7 +41,6 @@ function App() {
                 Minhas Compras
               </span>
             </div>
-            <div className="topbar-links hide-mobile"></div>
           </div>
         </section>
 
@@ -53,29 +57,76 @@ function App() {
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
               />
-              <button className="search-btn" type="submit">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                  stroke="white"
-                  strokeWidth="2"
-                  fill="none"
-                >
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-              </button>
             </form>
 
             <div className="header-actions">
-              <div className="cart-icon"></div>
               <img
                 src={logoEcommerce}
                 className="logo-brand"
                 alt="Logo"
+                style={{ cursor: "pointer" }}
                 onClick={() => setPortal("home")}
               />
+
+              <div className="login-container">
+                <div
+                  className="user-profile-trigger"
+                  onClick={() => setDropdownAberto(!dropdownAberto)}
+                >
+                  <div className="user-icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="20"
+                      height="20"
+                      fill="white"
+                    >
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                  </div>
+                  <div className="user-info-text hide-mobile">
+                    <span className="welcome-text">
+                      Olá, {usuarioLogado ? usuarioLogado.nome : "Entrar"}
+                    </span>
+                    <span className="account-text">Minha Conta ▼</span>
+                  </div>
+                </div>
+
+                {dropdownAberto && (
+                  <div className="login-dropdown">
+                    <p className="dropdown-title">Simular Login</p>
+                    <div className="user-list">
+                      {usuarios.map((u) => (
+                        <div
+                          key={u.id}
+                          className={`user-item ${idUsuarioLogado === String(u.id) ? "active" : ""}`}
+                          onClick={() => {
+                            setIdUsuarioLogado(String(u.id));
+                            setDropdownAberto(false);
+                          }}
+                        >
+                          {u.nome}
+                        </div>
+                      ))}
+                      {usuarios.length === 0 && (
+                        <div className="user-item">
+                          Nenhum usuário carregado
+                        </div>
+                      )}
+                    </div>
+                    {idUsuarioLogado && (
+                      <button
+                        className="logout-btn"
+                        onClick={() => {
+                          setIdUsuarioLogado("");
+                          setDropdownAberto(false);
+                        }}
+                      >
+                        Sair da conta
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
@@ -83,10 +134,16 @@ function App() {
 
       <main className="app-wrapper">
         <div className="content-card">
-          {portal === "home" && (
-            <ClientePortal busca={"busca"} setBusca={"setBusca"} />
+          {(portal === "home" || portal === "cliente") && (
+            <ClientePortal
+              usuarios={usuarios}
+              setUsuarios={setUsuarios}
+              idUsuarioLogado={idUsuarioLogado}
+              setIdUsuarioLogado={setIdUsuarioLogado}
+              busca={busca}
+              setBusca={setBusca}
+            />
           )}
-
           {portal === "admin" && (
             <div className="admin-section">
               <nav className="internal-nav">
@@ -96,10 +153,15 @@ function App() {
               {pagina === "usuarios" ? <Usuarios /> : <Produtos />}
             </div>
           )}
-
-          {portal === "vendedor" && <VendedorPortal />}
-          {portal === "cliente" && (
-            <ClientePortal busca={"busca"} setBusca={"setBusca"} />
+          {portal === "vendedor" && (
+            <VendedorPortal
+              usuarios={usuarios}
+              setUsuarios={setUsuarios}
+              idUsuarioLogado={idUsuarioLogado}
+              setIdUsuarioLogado={setIdUsuarioLogado}
+              busca={busca}
+              setBusca={setBusca}
+            />
           )}
         </div>
       </main>
