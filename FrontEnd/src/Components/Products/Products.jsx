@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import api from "../services/api";
+import api from "../../services/api";
 import Historic from "./ProductsHistoric";
+import "./Products.css";
 
 function ClientePortal({ busca, setUsuarios, idUsuarioLogado }) {
   const [produtos, setProdutos] = useState([]);

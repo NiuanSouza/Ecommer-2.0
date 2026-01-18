@@ -1,0 +1,29 @@
+nav {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0.5rem 2rem;
+  background-color: var(--primary);
+}
+
+#ecommercePhoto {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+nav button {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
