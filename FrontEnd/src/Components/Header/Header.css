@@ -27,3 +27,7 @@ nav button {
   border: 1px solid #ddd;
   border-radius: 8px;
 }
+
+.search-btn {
+  background-color: var(--accent);
+}
