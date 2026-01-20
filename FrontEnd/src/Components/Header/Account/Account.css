@@ -1,0 +1,111 @@
+/* --- Container e Gatilho do Perfil --- */
+.login-container {
+  position: relative;
+}
+
+.user-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.user-icon {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+}
+
+.user-info-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.welcome-text {
+  font-size: 10px;
+  opacity: 0.8;
+}
+.account-text {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* --- Dropdown de Login --- */
+.login-dropdown {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  width: 200px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: #333;
+  padding: 10px 0;
+  z-index: 1100;
+}
+
+.dropdown-title {
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 8px 15px;
+}
+
+/* --- Lista de Usuários --- */
+.user-list {
+  max-height: 150px;
+  overflow-y: auto;
+}
+.user-item {
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.user-item:hover {
+  background: #f0f0f0;
+}
+.user-item.active {
+  font-weight: bold;
+  color: var(--secondary);
+}
+
+/* --- Botões --- */
+.logout-btn {
+  width: calc(100% - 20px);
+  margin: 10px;
+  padding: 5px;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 768px) {
+  .container-header {
+    flex-wrap: wrap;
+  }
+  .search-container {
+    order: 3;
+    width: 100%;
+    margin: 10px 0 0 0;
+    max-width: none;
+  }
+  .hide-mobile {
+    display: none;
+  }
+  .app-wrapper {
+    margin-top: 150px;
+  }
+}
+
+@media (min-width: 769px) {
+  .app-wrapper {
+    margin-top: 130px;
+  }
+}
