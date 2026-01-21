@@ -92,28 +92,22 @@ function ClientePortal({ busca, setUsuarios, idUsuarioLogado }) {
           {produtosDisponiveis.map((p) => (
             <div key={p.id} className="portal-card">
               <h4>{p.nome}</h4>
+
+              <img
+                className="productImage"
+                src="https://http2.mlstatic.com/D_NQ_NP_2X_671673-MLA81578619819_122024-W.webp"
+                alt="Imagem não disponivel"
+              />
               <p
                 className="price"
                 style={{ color: "var(--secondary)", fontWeight: "bold" }}
               >
                 R$ {Number(p.preco || 0).toFixed(2)}
               </p>
-              <p>
-                <small>Estoque: {p.estoque}</small>
-              </p>
+
               <div style={{ display: "flex", gap: "5px" }}>
-                <input
-                  type="number"
-                  min="1"
-                  max={p.estoque}
-                  value={quantidades[p.id] || 1}
-                  onChange={(e) =>
-                    setQuantidades({ ...quantidades, [p.id]: e.target.value })
-                  }
-                  style={{ width: "50px" }}
-                />
                 <button className="btn-edit" onClick={() => handleComprar(p)}>
-                  Comprar
+                  Adicionar ao Carrinho
                 </button>
               </div>
             </div>
