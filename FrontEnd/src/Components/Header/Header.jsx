@@ -1,6 +1,6 @@
 import logoEcommerce from "../../assets/home.png";
 import Account from "./Account/Account.jsx";
-import Cart from "./Cart/Cart.jsx";
+import CartIcon from "./CartIcon/CartIcon.jsx";
 import SearchBar from "./SearchBar/SearchBar.jsx";
 import React from "react";
 
@@ -26,9 +26,6 @@ function Header({
             <span onClick={() => setPortal("admin")} className="topbar-link">
               Admin
             </span>
-            <span onClick={() => setPortal("vendedor")} className="topbar-link">
-              Vendedor
-            </span>
             <span onClick={() => setPortal("cliente")} className="topbar-link">
               Minhas Compras
             </span>
@@ -49,7 +46,7 @@ function Header({
           <SearchBar setBusca={setBusca} busca={busca} />
 
           <div className="header-actions">
-            <Cart setPortal={setPortal} />
+            <CartIcon setPortal={setPortal} />
 
             <Account
               usuarioLogado={usuarioLogado}

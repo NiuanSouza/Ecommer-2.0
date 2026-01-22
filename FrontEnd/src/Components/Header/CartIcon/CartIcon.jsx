@@ -1,5 +1,5 @@
 import CartEcommerce from "../../../assets/cart.png";
-import "./Cart.css";
+import "./CartIcon.css";
 import React, { useState, useEffect } from "react";
 
 function Cart({ setPortal }) {

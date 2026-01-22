@@ -1,20 +1,17 @@
 import React, { useState } from "react";
-
-import Usuarios from "./Components/admin/Usuarios";
-import Produtos from "./Components/admin/Produtos";
-
 import Header from "./Components/Header/Header.jsx";
-import ClientePortal from "./Components/Products/Products.jsx";
-import VendedorPortal from "./Components/VendedorPortal";
+import ProductsDisplay from "./Components/Products/ProductsDisplay/ProductsDisplay.jsx";
+import Products from "./Components/Products/Products.jsx"; // O componente de detalhe
+import Cart from "./Components/Cart/Cart.jsx"; // Ajustado caminho conforme contexto
 
 import "./App.css";
 
 function App() {
-  const [portal, setPortal] = useState("cliente");
-  const [pagina, setPagina] = useState("usuarios");
+  const [portal, setPortal] = useState("home");
   const [busca, setBusca] = useState("");
   const [usuarios, setUsuarios] = useState([]);
   const [idUsuarioLogado, setIdUsuarioLogado] = useState("");
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null); // Novo estado
 
   return (
     <div className="app-container">
@@ -31,44 +28,19 @@ function App() {
       <main className="app-wrapper">
         <div className="content-card">
           {(portal === "home" || portal === "cliente") && (
-            <ClientePortal
-              usuarios={usuarios}
-              setUsuarios={setUsuarios}
-              idUsuarioLogado={idUsuarioLogado}
-              setIdUsuarioLogado={setIdUsuarioLogado}
+            <ProductsDisplay
+              setPortal={setPortal}
+              setProdutoSelecionado={setProdutoSelecionado}
               busca={busca}
-              setBusca={setBusca}
-            />
-          )}
-          {portal === "admin" && (
-            <div className="admin-section">
-              <nav className="internal-nav">
-                <button onClick={() => setPagina("usuarios")}>Usuários</button>
-                <button onClick={() => setPagina("produtos")}>Produtos</button>
-              </nav>
-              {pagina === "usuarios" ? <Usuarios /> : <Produtos />}
-            </div>
-          )}
-          {portal === "vendedor" && (
-            <VendedorPortal
-              usuarios={usuarios}
-              setUsuarios={setUsuarios}
               idUsuarioLogado={idUsuarioLogado}
-              setIdUsuarioLogado={setIdUsuarioLogado}
-              busca={busca}
-              setBusca={setBusca}
             />
           )}
 
-          {portal === "cart" && (
-            <div className="admin-section">
-              <nav className="internal-nav">
-                <button onClick={() => setPagina("usuarios")}>Usuários</button>
-                <button onClick={() => setPagina("produtos")}>Produtos</button>
-              </nav>
-              {pagina === "usuarios" ? <Usuarios /> : <Produtos />}
-            </div>
+          {portal === "Product" && (
+            <Products product={produtoSelecionado} setPortal={setPortal} />
           )}
+
+          {portal === "cart" && <Cart idUsuarioLogado={idUsuarioLogado} />}
         </div>
       </main>
     </div>

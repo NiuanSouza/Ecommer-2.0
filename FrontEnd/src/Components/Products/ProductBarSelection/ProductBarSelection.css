@@ -1,0 +1,59 @@
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.pagination-tabs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 30px 0;
+  flex-wrap: wrap;
+}
+
+.tab-button {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  background-color: var(--white);
+  color: var(--text-main);
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  background-color: var(--bg-light);
+  border-color: var(--secondary);
+}
+
+.tab-button.active {
+  background-color: var(--secondary);
+  color: var(--white);
+  border-color: var(--secondary);
+}
+
+.nav-button {
+  padding: 8px 3px;
+  border: none;
+  cursor: pointer;
+  color: var(--primary);
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.nav-button:hover {
+  color: var(--secondary);
+}
+
+.nav-button.active {
+  color: var(--accent);
+}
+
+.nav-icon {
+  height: 20px;
+  width: 20px;
+}
