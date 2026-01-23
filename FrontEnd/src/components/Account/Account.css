@@ -1,0 +1,95 @@
+.login-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.user-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--white);
+}
+
+.user-icon {
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.user-info-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.welcome-text {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.account-text {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Menu Dropdown */
+.login-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  min-width: 200px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  margin-top: 10px;
+  padding: 10px;
+  z-index: 1001;
+  color: var(--primary);
+}
+
+.dropdown-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  padding-left: 10px;
+  text-transform: uppercase;
+}
+
+.user-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.user-item {
+  padding: 10px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  font-size: 14px;
+}
+
+.user-item:hover {
+  background: #f5f5f5;
+}
+
+.user-item.active {
+  background: #e3f2fd;
+  color: var(--secondary);
+  font-weight: bold;
+}
+
+.logout-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logout-btn:hover {
+  filter: brightness(1.1);
+}

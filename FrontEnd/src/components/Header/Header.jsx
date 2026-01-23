@@ -1,52 +1,45 @@
 import logoEcommerce from "../../assets/home.png";
-import Account from "./Account/Account.jsx";
-import CartIcon from "./CartIcon/CartIcon.jsx";
-import SearchBar from "./SearchBar/SearchBar.jsx";
+import { Link } from "react-router-dom";
+import Account from "../Account/Account.jsx";
+import CartIcon from "../CartIcon/CartIcon.jsx";
+import SearchBar from "../SearchBar/SearchBar.jsx";
 import React from "react";
 
 import "./Header.css";
 
 function Header({
-  setPortal,
   busca,
   setBusca,
   idUsuarioLogado,
-  usuarios,
+  usuarios = [],
   setIdUsuarioLogado,
 }) {
-  const usuarioLogado = usuarios.find(
-    (u) => String(u.id) === String(idUsuarioLogado),
-  );
+  // Proteção para evitar erro de .find caso o array ainda não exista
+  const usuarioLogado = Array.isArray(usuarios)
+    ? usuarios.find((u) => String(u.id) === String(idUsuarioLogado))
+    : null;
 
   return (
     <header className="main-header">
       <section className="header-topbar">
         <div className="container-header">
           <div className="topbar-links">
-            <span onClick={() => setPortal("admin")} className="topbar-link">
-              Admin
-            </span>
-            <span onClick={() => setPortal("cliente")} className="topbar-link">
-              Minhas Compras
-            </span>
+            <span className="topbar-link">Admin</span>
+            <span className="topbar-link">Minhas Compras</span>
           </div>
         </div>
       </section>
 
       <section className="header-main">
         <div className="container-header">
-          <img
-            src={logoEcommerce}
-            className="logo-brand"
-            alt="Logo"
-            style={{ cursor: "pointer" }}
-            onClick={() => setPortal("home")}
-          />
+          <Link to="/">
+            <img src={logoEcommerce} className="logo-brand" alt="Logo Home" />
+          </Link>
 
           <SearchBar setBusca={setBusca} busca={busca} />
 
           <div className="header-actions">
-            <CartIcon setPortal={setPortal} />
+            <CartIcon />
 
             <Account
               usuarioLogado={usuarioLogado}

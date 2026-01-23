@@ -1,46 +1,39 @@
-import React, { useState } from "react";
-import Header from "./Components/Header/Header.jsx";
-import ProductsDisplay from "./Components/Products/ProductsDisplay/ProductsDisplay.jsx";
-import Products from "./Components/Products/Products.jsx"; // O componente de detalhe
-import Cart from "./Components/Cart/Cart.jsx"; // Ajustado caminho conforme contexto
-
+import React, { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom";
+import Header from "./components/Header/Header.jsx"; // Corrigido caminho para PascalCase
+import api from "./services/api"; // Importe sua instância do axios
 import "./App.css";
 
 function App() {
-  const [portal, setPortal] = useState("home");
   const [busca, setBusca] = useState("");
   const [usuarios, setUsuarios] = useState([]);
   const [idUsuarioLogado, setIdUsuarioLogado] = useState("");
-  const [produtoSelecionado, setProdutoSelecionado] = useState(null); // Novo estado
+
+  // Busca usuários do banco de dados (SQLite) ao iniciar
+  useEffect(() => {
+    async function carregarUsuarios() {
+      try {
+        const response = await api.get("/usuarios"); // Rota definida no seu BackEnd
+        setUsuarios(response.data);
+      } catch (error) {
+        console.error("Erro ao carregar usuários:", error);
+      }
+    }
+    carregarUsuarios();
+  }, []);
 
   return (
     <div className="app-container">
       <Header
-        setBusca={setBusca}
         busca={busca}
-        setPortal={setPortal}
-        portal={portal}
+        setBusca={setBusca}
         idUsuarioLogado={idUsuarioLogado}
         usuarios={usuarios}
         setIdUsuarioLogado={setIdUsuarioLogado}
       />
-
       <main className="app-wrapper">
         <div className="content-card">
-          {(portal === "home" || portal === "cliente") && (
-            <ProductsDisplay
-              setPortal={setPortal}
-              setProdutoSelecionado={setProdutoSelecionado}
-              busca={busca}
-              idUsuarioLogado={idUsuarioLogado}
-            />
-          )}
-
-          {portal === "Product" && (
-            <Products product={produtoSelecionado} setPortal={setPortal} />
-          )}
-
-          {portal === "cart" && <Cart idUsuarioLogado={idUsuarioLogado} />}
+          <Outlet context={{ busca, idUsuarioLogado, setUsuarios }} />
         </div>
       </main>
     </div>
