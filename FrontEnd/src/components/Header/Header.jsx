@@ -1,6 +1,6 @@
 import logoEcommerce from "../../assets/home.png";
 import { Link } from "react-router-dom";
-import Account from "../Account/Account.jsx";
+import Account from "../Profile/Profile.jsx";
 import CartIcon from "../CartIcon/CartIcon.jsx";
 import SearchBar from "../SearchBar/SearchBar.jsx";
 import React from "react";

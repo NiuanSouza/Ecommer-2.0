@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Account.css";
+import "./Profile.css";
 import { FaUser } from "react-icons/fa";
 
 function Account({

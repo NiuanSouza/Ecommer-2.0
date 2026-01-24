@@ -13,6 +13,7 @@ routes.post("/login", UsuarioController.login);
 
 // Produtos
 routes.get("/produtos", ProdutoController.index);
+routes.get("/produtos/:id", ProdutoController.show);
 routes.post("/produtos", ProdutoController.store);
 
 // Carrinho
