@@ -1,4 +1,5 @@
 import { BsSearch } from "react-icons/bs";
+import {Link} from "react-router-dom";
 import "./SearchBar.css";
 
 function SearchBar({ setBusca, busca }) {
@@ -11,9 +12,9 @@ function SearchBar({ setBusca, busca }) {
         value={busca}
         onChange={(e) => setBusca(e.target.value)}
       />
-      <button type="submit" className="search-btn">
-        <BsSearch />
-      </button>
+        <Link to="/" className="search-btn">
+          <BsSearch />
+        </Link>
     </form>
   );
 }

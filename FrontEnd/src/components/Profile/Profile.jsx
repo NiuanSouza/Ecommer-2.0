@@ -1,16 +1,13 @@
 import React, { useState } from "react";
-import "./Profile.css";
+import "./Profile.css"; //
+import { Link } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
 
-function Account({
-  usuarioLogado,
-  usuarios,
-  idUsuarioLogado,
-  setIdUsuarioLogado,
-}) {
+function Profile({ usuarioLogado }) {
   const [dropdownAberto, setDropdownAberto] = useState(false);
+
   return (
-    <div className="login-container">
+    <div className="profile-container">
       <div
         className="user-profile-trigger"
         onClick={() => setDropdownAberto(!dropdownAberto)}
@@ -18,44 +15,46 @@ function Account({
         <div className="user-icon">
           <FaUser />
         </div>
+        
         <div className="user-info-text hide-mobile">
-          <span className="welcome-text">
-            Olá, {usuarioLogado ? usuarioLogado.nome : "Entrar"}
-          </span>
-          <span className="account-text">Minha Conta ▼</span>
+          {usuarioLogado ? (
+            <>
+              <span className="welcome-text">Olá, {usuarioLogado.nome}</span>
+              <span className="account-text">Minha Conta ▼</span>
+            </>
+          ) : (
+            <Link to="/login" onClick={(e) => e.stopPropagation()}>
+              <button className="login-btn">Logue-se</button>
+            </Link>
+          )}
         </div>
       </div>
 
       {dropdownAberto && (
         <div className="login-dropdown">
-          <p className="dropdown-title">Simular Login</p>
-          <div className="user-list">
-            {usuarios.map((u) => (
-              <div
-                key={u.id}
-                className={`user-item ${idUsuarioLogado === String(u.id) ? "active" : ""}`}
+          {!usuarioLogado ? (
+            <>
+              <Link to="/login" onClick={() => setDropdownAberto(false)}>
+                <button className="login-btn">Login</button>
+              </Link>
+              <Link to="/usuarios" onClick={() => setDropdownAberto(false)}>
+                <button className="login-btn">Registre-se</button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/perfil" onClick={() => setDropdownAberto(false)}>
+                <button className="login-btn">Meu Perfil</button>
+              </Link>
+              <button 
+                className="login-btn" 
                 onClick={() => {
-                  setIdUsuarioLogado(String(u.id));
                   setDropdownAberto(false);
                 }}
               >
-                {u.nome}
-              </div>
-            ))}
-            {usuarios.length === 0 && (
-              <div className="user-item">Nenhum usuário carregado</div>
-            )}
-          </div>
-          {idUsuarioLogado && (
-            <button
-              className="logout-btn"
-              onClick={() => {
-                setIdUsuarioLogado("");
-                setDropdownAberto(false);
-              }}
-            >
-              Sair da conta
-            </button>
+                Sair
+              </button>
+            </>
           )}
         </div>
       )}
@@ -63,4 +62,4 @@ function Account({
   );
 }
 
-export default Account;
+export default Profile;

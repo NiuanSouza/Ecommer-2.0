@@ -5,6 +5,8 @@ import App from "./App.jsx";
 import ProductsDisplay from "./pages/ProductsDisplay/ProductsDisplay.jsx";
 import Products from "./pages/Products/Products.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
+import Login from "./pages/Login/Login.jsx";
+import Register from "./pages/Register/Register.jsx";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +24,14 @@ const router = createBrowserRouter([
       {
         path: "cart",
         element: <Cart />,
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
       },
     ],
   },
