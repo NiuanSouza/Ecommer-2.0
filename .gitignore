@@ -7,17 +7,32 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Configurações de Ambiente (SEGURANÇA)
+# Nunca remova essas linhas; elas impedem o vazamento de senhas do banco
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Banco de Dados Local
+# Impede que o arquivo do SQLite ou dumps locais sejam enviados
+*.db
+*.sqlite
+*.sqlite3
+
 # Dependências
 node_modules/
 dist/
 dist-ssr/
-*.local
+build/
 
-# Editor directories and files
+# Editor de Código e Sistema Operacional
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj

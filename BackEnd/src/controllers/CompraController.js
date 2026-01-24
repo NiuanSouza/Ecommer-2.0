@@ -1,140 +1,77 @@
 const db = require("../database/connection");
 
 module.exports = {
-  // Listar histórico geral (Read)
-  index(req, res) {
-    const sql = `
-            SELECT C.id, 
-                   C.data_compra, 
-                   C.quantidade, 
-                   C.id_usuario_comprador, -- Adicione esta linha aqui
-                   U.nome as comprador, 
-                   P.nome as produto, 
-                   (C.quantidade * P.preco) as total
-            FROM Compra C
-            JOIN Usuario U ON C.id_usuario_comprador = U.id
-            JOIN Produto P ON C.id_produto = P.id
-            ORDER BY C.data_compra DESC
-        `;
-    db.all(sql, (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows);
-    });
-  },
+  // Finalizar a compra (Checkout)
+  async store(req, res) {
+    const { id_usuario_comprador } = req.body;
 
-  // Buscar compra específica (Read)
-  show(req, res) {
-    const { id } = req.params;
-    db.get("SELECT * FROM Compra WHERE id = ?", [id], (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      if (!row) return res.status(404).json({ error: "Compra não encontrada" });
-      res.json(row);
-    });
-  },
+    try {
+      // 1. Buscar itens do carrinho
+      const carrinho = await db.query(
+        "SELECT * FROM ecommerce.CarrinhoItem WHERE id_usuario = $1",
+        [id_usuario_comprador]
+      );
 
-  // Registrar nova compra com baixa de estoque (Create) [cite: 9, 13, 19]
-  store(req, res) {
-    const { id_usuario_comprador, id_produto, quantidade } = req.body;
+      if (carrinho.rows.length === 0) {
+        return res.status(400).json({ error: "Carrinho vazio." });
+      }
 
-    db.get(
-      "SELECT estoque FROM Produto WHERE id = ?",
-      [id_produto],
-      (err, produto) => {
-        if (!produto || produto.estoque < quantidade) {
-          return res.status(400).json({ error: "Estoque insuficiente" });
-        }
+      // 2. Calcular valor total (Join com tabela Produto para pegar preços atuais)
+      const valores = await db.query(
+        `SELECT SUM(p.preco * c.quantidade) as total 
+         FROM ecommerce.CarrinhoItem c 
+         JOIN ecommerce.Produto p ON c.id_produto = p.id 
+         WHERE c.id_usuario = $1`,
+        [id_usuario_comprador]
+      );
+      const valorTotal = valores.rows[0].total;
 
-        const data = new Date().toISOString();
-        db.run(
-          "INSERT INTO Compra (id_usuario_comprador, id_produto, quantidade, data_compra) VALUES (?, ?, ?, ?)",
-          [id_usuario_comprador, id_produto, quantidade, data],
-          function (err) {
-            if (err) return res.status(400).json({ error: err.message });
+      // 3. Criar o Pedido
+      const pedidoResult = await db.query(
+        "INSERT INTO ecommerce.Pedido (id_usuario_comprador, valor_total) VALUES ($1, $2) RETURNING id",
+        [id_usuario_comprador, valorTotal]
+      );
+      const id_pedido = pedidoResult.rows[0].id;
 
-            // Baixa automática de estoque
-            db.run("UPDATE Produto SET estoque = estoque - ? WHERE id = ?", [
-              quantidade,
-              id_produto,
-            ]);
-            res
-              .status(201)
-              .json({ id: this.lastID, status: "Venda realizada" });
-          },
+      // 4. Mover itens para PedidoItem e baixar estoque
+      for (const item of carrinho.rows) {
+        // Pegar preço atual do produto
+        const prod = await db.query("SELECT preco FROM ecommerce.Produto WHERE id = $1", [item.id_produto]);
+
+        await db.query(
+          `INSERT INTO ecommerce.PedidoItem (id_pedido, id_produto, quantidade, preco_unitario_venda) 
+           VALUES ($1, $2, $3, $4)`,
+          [id_pedido, item.id_produto, item.quantidade, prod.rows[0].preco]
         );
-      },
-    );
-  },
 
-  // Atualizar quantidade de uma compra (Update)
-  // Nota: Esta lógica ajusta o estoque proporcionalmente à diferença da nova quantidade
-  update(req, res) {
-    const { id } = req.params;
-    const { quantidade } = req.body;
-
-    db.get(
-      "SELECT id_produto, quantidade FROM Compra WHERE id = ?",
-      [id],
-      (err, compra) => {
-        if (!compra)
-          return res.status(404).json({ error: "Compra não encontrada" });
-
-        const diferenca = quantidade - compra.quantidade;
-
-        db.get(
-          "SELECT estoque FROM Produto WHERE id = ?",
-          [compra.id_produto],
-          (err, produto) => {
-            if (produto.estoque < diferenca) {
-              return res
-                .status(400)
-                .json({ error: "Estoque insuficiente para alteração" });
-            }
-
-            db.run(
-              "UPDATE Compra SET quantidade = ? WHERE id = ?",
-              [quantidade, id],
-              function (err) {
-                if (err) return res.status(400).json({ error: err.message });
-
-                // Ajusta o estoque baseando-se na diferença
-                db.run(
-                  "UPDATE Produto SET estoque = estoque - ? WHERE id = ?",
-                  [diferenca, compra.id_produto],
-                );
-                res.json({
-                  message: "Quantidade da compra atualizada e estoque ajustado",
-                });
-              },
-            );
-          },
+        // Baixar estoque
+        await db.query(
+          "UPDATE ecommerce.Produto SET estoque = estoque - $1 WHERE id = $2",
+          [item.quantidade, item.id_produto]
         );
-      },
-    );
+      }
+
+      // 5. Limpar carrinho
+      await db.query("DELETE FROM ecommerce.CarrinhoItem WHERE id_usuario = $1", [id_usuario_comprador]);
+
+      return res.status(201).json({ message: "Compra realizada com sucesso!", id_pedido });
+
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
   },
 
-  // Deletar compra (Delete)
-  // Nota: Deletar a compra devolve os itens ao estoque
-  delete(req, res) {
-    const { id } = req.params;
-
-    db.get(
-      "SELECT id_produto, quantidade FROM Compra WHERE id = ?",
-      [id],
-      (err, compra) => {
-        if (!compra)
-          return res.status(404).json({ error: "Compra não encontrada" });
-
-        db.run("DELETE FROM Compra WHERE id = ?", [id], function (err) {
-          if (err) return res.status(400).json({ error: err.message });
-
-          // Devolve a quantidade ao estoque do produto
-          db.run("UPDATE Produto SET estoque = estoque + ? WHERE id = ?", [
-            compra.quantidade,
-            compra.id_produto,
-          ]);
-          res.json({ message: "Compra removida e estoque restaurado" });
-        });
-      },
-    );
-  },
+  // Listar histórico de compras de um usuário
+  async index(req, res) {
+    const { id_usuario } = req.params;
+    try {
+      const result = await db.query(
+        "SELECT * FROM ecommerce.Pedido WHERE id_usuario_comprador = $1 ORDER BY data_pedido DESC",
+        [id_usuario]
+      );
+      return res.json(result.rows);
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
 };

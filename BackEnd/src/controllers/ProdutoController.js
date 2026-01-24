@@ -1,69 +1,35 @@
 const db = require("../database/connection");
 
 module.exports = {
-  // Listar todos os produtos(Read)
-  index(req, res) {
-    const { id_usuario_vendedor } = req.query;
-    if (id_usuario_vendedor) {
-      db.all(
-        "SELECT * FROM Produto WHERE id_usuario_vendedor = ?",
-        [id_usuario_vendedor],
-        (err, rows) => {
-          if (err) return res.status(500).json({ error: err.message });
-          res.json(rows);
-        },
-      );
-    } else {
-      db.all("SELECT * FROM Produto", (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
-      });
+  async index(req, res) {
+    try {
+      const { id_categoria } = req.query;
+      let query = "SELECT * FROM ecommerce.Produto WHERE estoque > 0";
+      let params = [];
+
+      if (id_categoria) {
+        query += " AND id_categoria = $1";
+        params.push(id_categoria);
+      }
+
+      const result = await db.query(query, params);
+      return res.json(result.rows);
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
     }
   },
 
-  // Buscar um produto específico (Read)
-  async show(req, res) {
-    const { id } = req.params;
-    db.get("SELECT * FROM Produto WHERE id = ?", [id], (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      if (!row)
-        return res.status(404).json({ error: "Produto não encontrado" });
-      res.json(row);
-    });
-  },
+  async store(req, res) {
+    const { nome, preco, estoque, descricao, imagem_url, id_usuario_vendedor, id_categoria } = req.body;
+    try {
+      const sql = `INSERT INTO ecommerce.Produto 
+        (nome, preco, estoque, descricao, imagem_url, id_usuario_vendedor, id_categoria) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
 
-  // Cria um produto (Create)
-  store(req, res) {
-    const { nome, preco, estoque, id_usuario_vendedor } = req.body;
-    const sql =
-      "INSERT INTO Produto (nome, preco, estoque, id_usuario_vendedor) VALUES (?, ?, ?, ?)";
-    db.run(sql, [nome, preco, estoque, id_usuario_vendedor], function (err) {
-      if (err) return res.status(400).json({ error: err.message });
-      res.status(201).json({ id: this.lastID, nome });
-    });
-  },
-
-  // Atualizar as informações de um produto(Update)
-  update(req, res) {
-    const { id } = req.params;
-    const { nome, preco, estoque } = req.body;
-    const sql =
-      "UPDATE Produto SET nome = ?, preco = ?, estoque = ? WHERE id = ?";
-    db.run(sql, [nome, preco, estoque, id], function (err) {
-      if (err) return res.status(400).json({ error: err.message });
-      res.json({ message: "Produto atualizado" });
-    });
-  },
-
-  // Deletar um produto(Delete)
-  delete(req, res) {
-    const { id } = req.params;
-    db.run("DELETE FROM Produto WHERE id = ?", [id], function (err) {
-      if (err)
-        return res.status(400).json({
-          error: "Produto vinculado a uma compra não pode ser excluído.",
-        });
-      res.json({ message: "Produto removido" });
-    });
-  },
+      const result = await db.query(sql, [nome, preco, estoque, descricao, imagem_url, id_usuario_vendedor, id_categoria]);
+      return res.status(201).json(result.rows[0]);
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
 };

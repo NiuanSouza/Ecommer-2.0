@@ -6,59 +6,63 @@
 }
 
 .portal-card {
-  background: white;
+  background: var(--white);
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  justify-content: space-between;
+  height: 350px; 
 }
 
-.portal-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+.img-container {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 10px;
+  background-color: var(--white);
+  border-radius: 8px;
 }
 
 .productImage {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 15px;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 .portal-card h4 {
-  font-size: 1.1rem;
-  color: var(--primary);
+  font-size: 1rem;
+  color: #333;
   margin: 10px 0;
-  height: 2.4em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
+  height: 2.4em; 
+  line-height: 1.2em;
 }
 
 .price {
-  color: #27ae60;
+  color: var(--secondary);
   font-weight: bold;
-  font-size: 1.3rem;
-  margin-bottom: 15px;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
 }
 
 .btn-add-cart {
-  background-color: var(--secondary);
+  background-color: var(--accent);
   color: white;
   border: none;
   padding: 12px;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-  transition: background 0.2s;
   margin-top: auto;
-}
-
-.btn-add-cart:hover {
-  filter: brightness(1.1);
 }

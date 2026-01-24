@@ -1,62 +1,48 @@
 const db = require("../database/connection");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 module.exports = {
-  // Listar todos os usuários git(Select)
+  // Cadastro de Usuário
+  async store(req, res) {
+    const { nome, email, senha, tipo, foto_perfil } = req.body;
+    try {
+      const hash = await bcrypt.hash(senha, 10);
+      const result = await db.query(
+        `INSERT INTO ecommerce.Usuario (nome, email, senha, tipo, foto_perfil) 
+         VALUES ($1, $2, $3, $4, $5) RETURNING id, nome, email, tipo`,
+        [nome, email, hash, tipo || 'cliente', foto_perfil]
+      );
+      return res.status(201).json(result.rows[0]);
+    } catch (err) {
+      return res.status(400).json({ error: "Usuário já existe ou dados inválidos." });
+    }
+  },
+
+  // Login de Usuário
+  async login(req, res) {
+    const { email, senha } = req.body;
+    try {
+      const result = await db.query("SELECT * FROM ecommerce.Usuario WHERE email = $1", [email]);
+      const user = result.rows[0];
+
+      if (!user || !(await bcrypt.compare(senha, user.senha))) {
+        return res.status(401).json({ error: "E-mail ou senha incorretos." });
+      }
+
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+      return res.json({
+        user: { id: user.id, nome: user.nome, email: user.email, tipo: user.tipo },
+        token
+      });
+    } catch (err) {
+      return res.status(500).json({ error: "Erro no servidor." });
+    }
+  },
+
   async index(req, res) {
-    db.all("SELECT * FROM Usuario", (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows);
-    });
-  },
-
-  // Buscar um usuário específico por ID (Select)
-  async show(req, res) {
-    const { id } = req.params;
-    db.get("SELECT * FROM Usuario WHERE id = ?", [id], (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      if (!row)
-        return res.status(404).json({ error: "Usuário não encontrado" });
-      res.json(row);
-    });
-  },
-
-  // Criar (Create)
-  store(req, res) {
-    const { nome, email } = req.body;
-    db.run(
-      "INSERT INTO Usuario (nome, email) VALUES (?, ?)",
-      [nome, email],
-      function (err) {
-        if (err) return res.status(400).json({ error: "Email já cadastrado." });
-        res.status(201).json({ id: this.lastID, nome, email });
-      },
-    );
-  },
-
-  // Atualizar (Update)
-  update(req, res) {
-    const { id } = req.params;
-    const { nome, email } = req.body;
-    db.run(
-      "UPDATE Usuario SET nome = ?, email = ? WHERE id = ?",
-      [nome, email, id],
-      function (err) {
-        if (err) return res.status(400).json({ error: err.message });
-        res.json({ message: "Usuário atualizado com sucesso" });
-      },
-    );
-  },
-
-  // Deletar (Delete)
-  delete(req, res) {
-    const { id } = req.params;
-    db.run("DELETE FROM Usuario WHERE id = ?", [id], function (err) {
-      if (err)
-        return res.status(400).json({
-          error:
-            "Não é possível deletar usuário com produtos ou compras vinculadas.",
-        });
-      res.json({ message: "Usuário removido" });
-    });
-  },
+    const result = await db.query("SELECT id, nome, email, tipo, foto_perfil FROM ecommerce.Usuario");
+    return res.json(result.rows);
+  }
 };
