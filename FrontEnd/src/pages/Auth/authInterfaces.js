@@ -9,9 +9,25 @@ export const authInterfaces = {
     path: "/register",
     fields: ["email", "senha"],
     onSubmit: async (data) => {
-      console.log("Tentativa de login:", data);
-      alert("Logado com sucesso (Simulado)");
-      return true;
+      try {
+        const response = await api.post("/login", {
+          email: data.email,
+          senha: data.senha
+        });
+
+        if (response.data.token) {
+          localStorage.setItem("@Ecommerce:token", response.data.token);
+          localStorage.setItem("@Ecommerce:user", JSON.stringify(response.data.user));
+
+          api.defaults.headers.Authorization = `Bearer ${response.data.token}`;
+
+          alert(`Bem-vindo, ${response.data.user.nome}!`);
+          return true;
+        }
+      } catch (error) {
+        alert(error.response?.data?.error || "Erro ao realizar login.");
+        return false;
+      }
     }
   },
   register: {

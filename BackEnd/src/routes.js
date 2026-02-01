@@ -7,6 +7,9 @@ const ProdutoController = require("./controllers/ProdutoController");
 const CarrinhoController = require("./controllers/CarrinhoController");
 const CompraController = require("./controllers/CompraController");
 
+// ADICIONE ESTA LINHA AQUI:
+const authMiddleware = require("./middlewares/auth");
+
 // Usuarios e Login
 routes.post("/usuarios", UsuarioController.store);
 routes.post("/login", UsuarioController.login);
@@ -16,11 +19,12 @@ routes.get("/produtos", ProdutoController.index);
 routes.get("/produtos/:id", ProdutoController.show);
 routes.post("/produtos", ProdutoController.store);
 
-// Carrinho
-routes.get("/carrinho/:id_usuario", CarrinhoController.index);
-routes.post("/carrinho", CarrinhoController.add);
+// Carrinho (Agora a variável authMiddleware existe!)
+routes.get("/carrinho/:id_usuario", authMiddleware, CarrinhoController.index);
+routes.post("/carrinho", authMiddleware, CarrinhoController.add);
+routes.get("/meu-perfil", authMiddleware, UsuarioController.show);
 
 // Finalizar Compra
-routes.post("/compras", CompraController.store);
+routes.post("/compras", authMiddleware, CompraController.store);
 
 module.exports = routes;

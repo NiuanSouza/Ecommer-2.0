@@ -32,8 +32,15 @@ module.exports = {
 
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
+      // AGORA RETORNA A FOTO TAMBÉM
       return res.json({
-        user: { id: user.id, nome: user.nome, email: user.email, tipo: user.tipo },
+        user: {
+          id: user.id,
+          nome: user.nome,
+          email: user.email,
+          tipo: user.tipo,
+          foto_perfil: user.foto_perfil // Certifique-se que o nome da coluna no banco é este
+        },
         token
       });
     } catch (err) {
@@ -41,8 +48,22 @@ module.exports = {
     }
   },
 
-  async index(req, res) {
-    const result = await db.query("SELECT id, nome, email, tipo, foto_perfil FROM ecommerce.Usuario");
-    return res.json(result.rows);
+  async show(req, res) {
+    try {
+      const result = await db.query(
+        "SELECT id, nome, tipo, foto_perfil FROM ecommerce.Usuario WHERE id = $1",
+        [req.userId]
+      );
+
+      const user = result.rows[0];
+
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado." });
+      }
+
+      return res.json(user);
+    } catch (err) {
+      return res.status(500).json({ error: "Erro interno ao buscar perfil." });
+    }
   }
 };
