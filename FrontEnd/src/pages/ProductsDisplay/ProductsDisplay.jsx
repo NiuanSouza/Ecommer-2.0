@@ -5,14 +5,19 @@ import ProductBarSelection from "../../components/ProductBarSelection/ProductBar
 import "./ProductsDisplay.css";
 
 function ProductsDisplay() {
-  const { busca, idUsuarioLogado } = useOutletContext();
+  const { busca } = useOutletContext();
+
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
-  
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const produtosPorPagina = 40; 
+  const produtosPorPagina = 40;
 
   const navigate = useNavigate();
+
+  const obterUsuarioLogado = () => {
+    const userStorage = localStorage.getItem("@Ecommerce:user");
+    return userStorage ? JSON.parse(userStorage) : null;
+  };
 
   useEffect(() => {
     const carregarProdutos = async () => {
@@ -27,7 +32,7 @@ function ProductsDisplay() {
           );
         }
         setProdutos(lista);
-        setPaginaAtual(1); 
+        setPaginaAtual(1);
       } catch (error) {
         console.error("Erro ao carregar vitrine:", error);
       } finally {
@@ -46,24 +51,34 @@ function ProductsDisplay() {
 
   const handleComprar = async (e, produto) => {
     e.stopPropagation();
-    if (!idUsuarioLogado) return alert("Selecione um usuário primeiro!");
+    const usuario = obterUsuarioLogado();
+
+    if (!usuario || !usuario.id) {
+      return alert(
+        "Você precisa estar logado para adicionar itens ao carrinho!",
+      );
+    }
 
     try {
-      await api.post("/compras", {
-        id_usuario_comprador: parseInt(idUsuarioLogado),
+      await api.post("/carrinho", {
+        id_usuario: parseInt(usuario.id),
         id_produto: produto.id,
         quantidade: 1,
       });
+
       alert(`"${produto.nome}" adicionado ao carrinho!`);
-    } catch {
-      alert("Erro ao processar compra.");
+
+      window.dispatchEvent(new Event("carrinhoAtualizado"));
+    } catch (error) {
+      console.error("Erro ao adicionar ao carrinho:", error);
+      alert("Erro ao adicionar o item ao carrinho.");
     }
   };
 
   if (loading) return <div className="loader">Carregando catálogo...</div>;
 
-  if (produtosExibidos.length === 0) return <div>Nenhum produto encontrado.</div>;
-
+  if (produtosExibidos.length === 0)
+    return <div>Nenhum produto encontrado.</div>;
 
   return (
     <section className="vitrine-container">
@@ -92,7 +107,7 @@ function ProductsDisplay() {
         ))}
       </div>
 
-      <ProductBarSelection 
+      <ProductBarSelection
         numeroDePaginas={totalPaginas}
         abas={abas}
         paginaAtual={paginaAtual}

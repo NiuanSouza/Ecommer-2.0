@@ -17,7 +17,7 @@ function AuthPage({ mode }) {
     e.preventDefault();
     const success = await config.onSubmit(values);
     if (success && mode === "register") navigate("/login");
-    if (success && mode === "login") navigate("/");
+    if (success && mode === "login") window.location.href = "/";
   };
 
   return (
