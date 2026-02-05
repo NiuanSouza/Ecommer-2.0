@@ -23,6 +23,8 @@ routes.post("/produtos", ProdutoController.store);
 routes.get("/carrinho/:id_usuario", authMiddleware, CarrinhoController.index);
 routes.post("/carrinho", authMiddleware, CarrinhoController.add);
 routes.get("/meu-perfil", authMiddleware, UsuarioController.show);
+routes.post("/carrinho", authMiddleware, CarrinhoController.add);
+routes.delete("/carrinho/:id_usuario/:id_produto", authMiddleware, CarrinhoController.delete); // Adicione esta linha
 
 // Finalizar Compra
 routes.post("/compras", authMiddleware, CompraController.store);

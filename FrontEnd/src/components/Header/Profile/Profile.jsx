@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./Profile.css";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
-import api from "../../services/api";
+import api from "../../../../src/services/api";
 
 function Profile() {
   const navigate = useNavigate();

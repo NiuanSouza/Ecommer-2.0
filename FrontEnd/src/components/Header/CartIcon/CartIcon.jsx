@@ -1,8 +1,8 @@
-import CartEcommerce from "../../assets/cart.png";
+import CartEcommerce from "../../../assets/cart.png";
 import { Link } from "react-router-dom";
 import "./CartIcon.css";
 import React, { useState, useEffect, useCallback } from "react";
-import api from "../../services/api";
+import api from "../../../../src/services/api";
 
 function CartIcon() {
   const [cartStatus, setCartStatus] = useState(0);

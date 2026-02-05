@@ -6,7 +6,6 @@ import "./ProductsDisplay.css";
 
 function ProductsDisplay() {
   const { busca } = useOutletContext();
-
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -67,7 +66,6 @@ function ProductsDisplay() {
       });
 
       alert(`"${produto.nome}" adicionado ao carrinho!`);
-
       window.dispatchEvent(new Event("carrinhoAtualizado"));
     } catch (error) {
       console.error("Erro ao adicionar ao carrinho:", error);
@@ -76,29 +74,36 @@ function ProductsDisplay() {
   };
 
   if (loading) return <div className="loader">Carregando catálogo...</div>;
-
   if (produtosExibidos.length === 0)
-    return <div>Nenhum produto encontrado.</div>;
+    return <div className="no-products">Nenhum produto encontrado.</div>;
 
   return (
-    <section className="vitrine-container">
-      <div className="card-grid">
+    <section className="display-vitrine-container">
+      <div className="display-card-grid">
         {produtosExibidos.map((p) => (
           <div
             key={p.id}
-            className="portal-card"
+            className="display-portal-card"
             onClick={() => navigate(`/product/${p.id}`)}
           >
-            <div className="card-content">
-              <div className="img-container">
-                <img className="productImage" src={p.imagem_url} alt={p.nome} />
+            <div className="display-card-content">
+              <div className="display-img-container">
+                <img
+                  className="display-productImage"
+                  src={p.imagem_url}
+                  alt={p.nome}
+                />
               </div>
-              <h4 title={p.nome}>{p.nome}</h4>
-              <p className="price">R$ {parseFloat(p.preco).toFixed(2)}</p>
+              <h4 className="display-product-title" title={p.nome}>
+                {p.nome}
+              </h4>
+              <p className="display-price">
+                R$ {parseFloat(p.preco).toFixed(2)}
+              </p>
             </div>
 
             <button
-              className="btn-add-cart"
+              className="display-btn-add-cart"
               onClick={(e) => handleComprar(e, p)}
             >
               Adicionar ao Carrinho
@@ -107,12 +112,14 @@ function ProductsDisplay() {
         ))}
       </div>
 
-      <ProductBarSelection
-        numeroDePaginas={totalPaginas}
-        abas={abas}
-        paginaAtual={paginaAtual}
-        setPaginaAtual={setPaginaAtual}
-      />
+      <div className="display-pagination-container">
+        <ProductBarSelection
+          numeroDePaginas={totalPaginas}
+          abas={abas}
+          paginaAtual={paginaAtual}
+          setPaginaAtual={setPaginaAtual}
+        />
+      </div>
     </section>
   );
 }
