@@ -1,4 +1,3 @@
-// src/routes.js
 const express = require("express");
 const routes = express.Router();
 
@@ -7,26 +6,26 @@ const ProdutoController = require("./controllers/ProdutoController");
 const CarrinhoController = require("./controllers/CarrinhoController");
 const CompraController = require("./controllers/CompraController");
 
-// ADICIONE ESTA LINHA AQUI:
 const authMiddleware = require("./middlewares/auth");
 
-// Usuarios e Login
+// --- USUÁRIOS ---
+// Corrigido: Cadastro usa .store
 routes.post("/usuarios", UsuarioController.store);
 routes.post("/login", UsuarioController.login);
+routes.get("/usuarios", authMiddleware, UsuarioController.index);
+routes.get("/meu-perfil", authMiddleware, UsuarioController.show);
 
-// Produtos
+// --- PRODUTOS ---
 routes.get("/produtos", ProdutoController.index);
 routes.get("/produtos/:id", ProdutoController.show);
-routes.post("/produtos", ProdutoController.store);
+routes.post("/produtos", authMiddleware, ProdutoController.store);
 
-// Carrinho (Agora a variável authMiddleware existe!)
+// --- CARRINHO ---
 routes.get("/carrinho/:id_usuario", authMiddleware, CarrinhoController.index);
 routes.post("/carrinho", authMiddleware, CarrinhoController.add);
-routes.get("/meu-perfil", authMiddleware, UsuarioController.show);
-routes.post("/carrinho", authMiddleware, CarrinhoController.add);
-routes.delete("/carrinho/:id_usuario/:id_produto", authMiddleware, CarrinhoController.delete); // Adicione esta linha
+routes.delete("/carrinho/:id_usuario/:id_produto", authMiddleware, CarrinhoController.delete);
 
-// Finalizar Compra
+// --- COMPRAS ---
 routes.post("/compras", authMiddleware, CompraController.store);
 
 module.exports = routes;

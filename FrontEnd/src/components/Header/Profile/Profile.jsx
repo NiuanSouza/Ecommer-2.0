@@ -79,7 +79,6 @@ function Profile() {
                 <p className="user-full-name">
                   {formatarNomeExibicao(usuario.nome)}
                 </p>
-                <small className="user-role-badge">{usuario.tipo}</small>
               </div>
               <hr />
               <Link to="/perfil" onClick={() => setDropdownAberto(false)}>

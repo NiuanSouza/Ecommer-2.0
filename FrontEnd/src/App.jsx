@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import Header from "./components/Header/Header.jsx"; // Corrigido caminho para PascalCase
-import api from "./services/api"; // Importe sua instância do axios
+import Header from "./components/Header/Header.jsx";
+import api from "./services/api";
 import "./App.css";
 
 function App() {
@@ -9,11 +9,10 @@ function App() {
   const [usuarios, setUsuarios] = useState([]);
   const [idUsuarioLogado, setIdUsuarioLogado] = useState("");
 
-  // Busca usuários do banco de dados (SQLite) ao iniciar
   useEffect(() => {
     async function carregarUsuarios() {
       try {
-        const response = await api.get("/usuarios"); // Rota definida no seu BackEnd
+        const response = await api.get("/usuarios");
         setUsuarios(response.data);
       } catch (error) {
         console.error("Erro ao carregar usuários:", error);

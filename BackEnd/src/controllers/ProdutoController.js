@@ -1,6 +1,7 @@
 const db = require("../database/connection");
 
 module.exports = {
+  // Lista todos os produtos (Vitrine)
   async index(req, res) {
     try {
       const { id_categoria } = req.query;
@@ -19,6 +20,28 @@ module.exports = {
     }
   },
 
+  // Busca detalhes de UM produto (Página pd-detail-container)
+  async show(req, res) {
+    const { id } = req.params;
+    try {
+      const result = await db.query(
+        "SELECT * FROM ecommerce.Produto WHERE id = $1",
+        [id]
+      );
+
+      const produto = result.rows[0];
+
+      if (!produto) {
+        return res.status(404).json({ error: "Produto não encontrado." });
+      }
+
+      return res.json(produto);
+    } catch (err) {
+      return res.status(500).json({ error: "Erro ao buscar detalhes do produto." });
+    }
+  },
+
+  // Cadastro de novos produtos
   async store(req, res) {
     const { nome, preco, estoque, descricao, imagem_url, id_usuario_vendedor, id_categoria } = req.body;
     try {
@@ -31,23 +54,5 @@ module.exports = {
     } catch (err) {
       return res.status(400).json({ error: err.message });
     }
-  },
-
-  // Adicione este método dentro do module.exports no ProdutoController.js
-  async show(req, res) {
-    try {
-      const { id } = req.params;
-      const query = "SELECT * FROM ecommerce.Produto WHERE id = $1";
-      const result = await db.query(query, [id]);
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Produto não encontrado" });
-      }
-
-      return res.json(result.rows[0]);
-    } catch (err) {
-      return res.status(500).json({ error: err.message });
-    }
-  },
+  }
 };
-

@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 module.exports = {
-  // Cadastro de Usuário
+  // Cadastro (POST /usuarios)
   async store(req, res) {
     const { nome, email, senha, tipo, foto_perfil } = req.body;
     try {
@@ -15,11 +15,21 @@ module.exports = {
       );
       return res.status(201).json(result.rows[0]);
     } catch (err) {
-      return res.status(400).json({ error: "Usuário já existe ou dados inválidos." });
+      return res.status(400).json({ error: "Erro ao cadastrar: e-mail já existe." });
     }
   },
 
-  // Login de Usuário
+  // Listagem (GET /usuarios)
+  async index(req, res) {
+    try {
+      const result = await db.query("SELECT id, nome, email, tipo FROM ecommerce.Usuario");
+      return res.json(result.rows);
+    } catch (err) {
+      return res.status(500).json({ error: "Erro ao listar usuários." });
+    }
+  },
+
+  // Login (POST /login)
   async login(req, res) {
     const { email, senha } = req.body;
     try {
@@ -32,15 +42,8 @@ module.exports = {
 
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-      // AGORA RETORNA A FOTO TAMBÉM
       return res.json({
-        user: {
-          id: user.id,
-          nome: user.nome,
-          email: user.email,
-          tipo: user.tipo,
-          foto_perfil: user.foto_perfil // Certifique-se que o nome da coluna no banco é este
-        },
+        user: { id: user.id, nome: user.nome, email: user.email, tipo: user.tipo, foto_perfil: user.foto_perfil },
         token
       });
     } catch (err) {
@@ -48,19 +51,15 @@ module.exports = {
     }
   },
 
+  // Perfil (GET /meu-perfil)
   async show(req, res) {
     try {
       const result = await db.query(
-        "SELECT id, nome, tipo, foto_perfil FROM ecommerce.Usuario WHERE id = $1",
+        "SELECT id, nome, email, tipo, foto_perfil FROM ecommerce.Usuario WHERE id = $1",
         [req.userId]
       );
-
       const user = result.rows[0];
-
-      if (!user) {
-        return res.status(404).json({ error: "Usuário não encontrado." });
-      }
-
+      if (!user) return res.status(404).json({ error: "Usuário não encontrado." });
       return res.json(user);
     } catch (err) {
       return res.status(500).json({ error: "Erro interno ao buscar perfil." });

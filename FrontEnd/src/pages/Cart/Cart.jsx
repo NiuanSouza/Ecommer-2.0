@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import api from "../../services/api"; //
+import api from "../../services/api";
 import { FaPlus, FaMinus, FaTrash } from "react-icons/fa";
 import "./Cart.css";
 
