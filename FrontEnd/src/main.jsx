@@ -7,6 +7,7 @@ import Products from "./pages/Products/Products.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
 import AuthPage from "./pages/Auth/AuthPage";
 import Profile from "./pages/Profile/ProfilePage.jsx";
+import Orders from "./pages/Orders/Orders";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "/perfil",
         element: <Profile />,
+      },
+      {
+        path: "/orders",
+        element: <Orders />,
       },
     ],
   },

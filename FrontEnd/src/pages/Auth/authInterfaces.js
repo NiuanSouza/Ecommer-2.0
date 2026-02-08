@@ -8,7 +8,7 @@ export const authInterfaces = {
     switchText: "Não tem uma conta? Registre-se.",
     path: "/register",
     fields: ["email", "senha"],
-    onSubmit: async (data) => {
+    onSubmit: async (data, showModal) => {
       try {
         const response = await api.post("/login", {
           email: data.email,
@@ -21,30 +21,31 @@ export const authInterfaces = {
 
           api.defaults.headers.Authorization = `Bearer ${response.data.token}`;
 
-          alert(`Bem-vindo, ${response.data.user.nome}!`);
+          showModal(`Bem-vindo, ${response.data.user.nome}!`, "success");
           return true;
         }
       } catch (error) {
-        alert(error.response?.data?.error || "Erro ao realizar login.");
+        showModal(error.response?.data?.error || "Erro ao realizar login.", "error");
         return false;
       }
     }
   },
+
   register: {
     subtitle: "Informe os seus dados abaixo para criar sua conta.",
     buttonText: "Cadastrar",
     switchText: "Já tem uma conta? Logue-se.",
     path: "/login",
     fields: ["nome", "email", "senha"],
-    onSubmit: async (data) => {
+    onSubmit: async (data, showModal) => {
       try {
         const response = await api.post("/usuarios", data);
         if (response.status === 201) {
-          alert("Cadastro realizado com sucesso!");
+          showModal("Cadastro realizado com sucesso!", "success");
           return true;
         }
       } catch (error) {
-        alert(error.response?.data?.error || "Erro ao cadastrar.");
+        showModal(error.response?.data?.error || "Erro ao cadastrar.", "error");
         return false;
       }
     }

@@ -26,5 +26,6 @@ routes.delete("/carrinho/:id_usuario/:id_produto", authMiddleware, CarrinhoContr
 
 // --- COMPRAS ---
 routes.post("/compras", CompraController.store);
+routes.get("/compras/:id_usuario", authMiddleware, CompraController.index);
 
 module.exports = routes;

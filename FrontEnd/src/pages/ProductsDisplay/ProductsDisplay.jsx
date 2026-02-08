@@ -3,6 +3,8 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import api from "../../services/api";
 import ProductBarSelection from "../../components/ProductBarSelection/ProductBarSelection";
 import "./ProductsDisplay.css";
+import { useModal } from "../../hooks/useModal";
+import Modal from "../../components/Modal/Modal";
 
 function ProductsDisplay() {
   const { busca } = useOutletContext();
@@ -10,8 +12,9 @@ function ProductsDisplay() {
   const [loading, setLoading] = useState(true);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const produtosPorPagina = 40;
-
   const navigate = useNavigate();
+
+  const { modalConfig, showModal, closeModal } = useModal();
 
   const obterUsuarioLogado = () => {
     const userStorage = localStorage.getItem("@Ecommerce:user");
@@ -41,20 +44,14 @@ function ProductsDisplay() {
     carregarProdutos();
   }, [busca]);
 
-  const totalPaginas = Math.ceil(produtos.length / produtosPorPagina);
-  const indiceUltimoProd = paginaAtual * produtosPorPagina;
-  const indicePrimeiroProd = indiceUltimoProd - produtosPorPagina;
-  const produtosExibidos = produtos.slice(indicePrimeiroProd, indiceUltimoProd);
-
-  const abas = Array.from({ length: totalPaginas }, (_, i) => i + 1);
-
   const handleComprar = async (e, produto) => {
     e.stopPropagation();
     const usuario = obterUsuarioLogado();
 
     if (!usuario || !usuario.id) {
-      return alert(
+      return showModal(
         "Você precisa estar logado para adicionar itens ao carrinho!",
+        "error",
       );
     }
 
@@ -65,13 +62,19 @@ function ProductsDisplay() {
         quantidade: 1,
       });
 
-      alert(`"${produto.nome}" adicionado ao carrinho!`);
+      showModal(`"${produto.nome}" adicionado ao carrinho!`, "success");
       window.dispatchEvent(new Event("carrinhoAtualizado"));
     } catch (error) {
       console.error("Erro ao adicionar ao carrinho:", error);
-      alert("Erro ao adicionar o item ao carrinho.");
+      showModal("Erro ao adicionar o item ao carrinho.", "error");
     }
   };
+
+  const totalPaginas = Math.ceil(produtos.length / produtosPorPagina);
+  const indiceUltimoProd = paginaAtual * produtosPorPagina;
+  const indicePrimeiroProd = indiceUltimoProd - produtosPorPagina;
+  const produtosExibidos = produtos.slice(indicePrimeiroProd, indiceUltimoProd);
+  const abas = Array.from({ length: totalPaginas }, (_, i) => i + 1);
 
   if (loading) return <div className="loader">Carregando catálogo...</div>;
   if (produtosExibidos.length === 0)
@@ -120,6 +123,8 @@ function ProductsDisplay() {
           setPaginaAtual={setPaginaAtual}
         />
       </div>
+
+      <Modal config={modalConfig} onClose={closeModal} />
     </section>
   );
 }

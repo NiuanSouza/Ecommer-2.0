@@ -2,12 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import "./Products.css";
+import { useModal } from "../../hooks/useModal";
+import Modal from "../../components/Modal/Modal";
 
 function Products() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const { modalConfig, showModal, closeModal } = useModal();
 
   const obterUsuarioLogado = () => {
     const userStorage = localStorage.getItem("@Ecommerce:user");
@@ -34,7 +38,7 @@ function Products() {
     const usuario = obterUsuarioLogado();
 
     if (!usuario || !usuario.id) {
-      return alert(
+      return showModal(
         "Você precisa estar logado para adicionar itens ao carrinho!",
       );
     }
@@ -51,11 +55,11 @@ function Products() {
       if (redirecionar) {
         navigate("/cart");
       } else {
-        alert(`"${produto.nome}" adicionado ao carrinho!`);
+        showModal(`"${produto.nome}" adicionado ao carrinho!`);
       }
     } catch (error) {
       console.error("Erro ao adicionar ao carrinho:", error);
-      alert("Erro ao adicionar o item ao carrinho.");
+      showModal("Erro ao adicionar o item ao carrinho.");
     }
   };
 
@@ -112,6 +116,8 @@ function Products() {
           </div>
         </div>
       </div>
+
+      <Modal config={modalConfig} onClose={closeModal} />
     </div>
   );
 }

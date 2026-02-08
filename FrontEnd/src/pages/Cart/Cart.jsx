@@ -3,12 +3,16 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import api from "../../services/api";
 import { FaPlus, FaMinus, FaTrash } from "react-icons/fa";
 import "./Cart.css";
+import { useModal } from "../../hooks/useModal";
+import Modal from "../../components/Modal/Modal";
 
 function Cart() {
   const { busca } = useOutletContext();
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const { modalConfig, showModal, closeModal } = useModal();
 
   const getUserId = () => {
     const userStorage = localStorage.getItem("@Ecommerce:user");
@@ -28,7 +32,7 @@ function Cart() {
       }
       setProdutos(lista);
     } catch (error) {
-      console.error("Erro:", error);
+      console.error("Erro ao carregar carrinho:", error);
     } finally {
       setLoading(false);
     }
@@ -48,7 +52,7 @@ function Cart() {
       carregarCarrinho();
       window.dispatchEvent(new Event("carrinhoAtualizado"));
     } catch {
-      alert("Erro ao atualizar.");
+      showModal("Erro ao atualizar a quantidade.", "error");
     }
   };
 
@@ -58,7 +62,7 @@ function Cart() {
       carregarCarrinho();
       window.dispatchEvent(new Event("carrinhoAtualizado"));
     } catch {
-      alert("Erro ao remover.");
+      showModal("Erro ao remover o item.", "error");
     }
   };
 
@@ -79,12 +83,20 @@ function Cart() {
         },
       );
 
-      alert(response.data.message || "Compra realizada com sucesso!");
+      showModal(
+        response.data.message || "Compra realizada com sucesso!",
+        "success",
+      );
+
       window.dispatchEvent(new Event("carrinhoAtualizado"));
-      navigate("/");
+
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
     } catch (error) {
-      console.error("Erro na compra:", error.response?.data);
-      alert(error.response?.data?.error || "Erro ao processar o pedido.");
+      const errorMsg =
+        error.response?.data?.error || "Erro ao processar o pedido.";
+      showModal(errorMsg, "error");
     }
   };
 
@@ -147,7 +159,10 @@ function Cart() {
           Finalizar
         </button>
       </div>
+
+      <Modal config={modalConfig} onClose={closeModal} />
     </section>
   );
 }
+
 export default Cart;

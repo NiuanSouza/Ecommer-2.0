@@ -84,7 +84,7 @@ function Profile() {
               <Link to="/perfil" onClick={() => setDropdownAberto(false)}>
                 <button className="login-btn">Meu Perfil</button>
               </Link>
-              <Link to="/pedidos" onClick={() => setDropdownAberto(false)}>
+              <Link to="/orders" onClick={() => setDropdownAberto(false)}>
                 <button className="login-btn">Meus Pedidos</button>
               </Link>
               <button className="login-btn logout-style" onClick={handleLogout}>

@@ -58,5 +58,18 @@ module.exports = {
       console.error("Erro no Banco de Dados:", err.message);
       return res.status(500).json({ error: "Falha ao processar compra no banco de dados." });
     }
+  },
+
+  async index(req, res) {
+    const { id_usuario } = req.params;
+    try {
+      const result = await db.query(
+        "SELECT * FROM ecommerce.Pedido WHERE id_usuario_comprador = $1 ORDER BY data_pedido DESC",
+        [id_usuario]
+      );
+      return res.json(result.rows);
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
   }
 };

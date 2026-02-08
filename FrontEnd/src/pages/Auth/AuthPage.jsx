@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { authInterfaces } from "./authInterfaces";
 import "./Auth.css";
+import { useModal } from "../../hooks/useModal";
+import Modal from "../../components/Modal/Modal";
 
 function AuthPage({ mode }) {
   const navigate = useNavigate();
   const config = authInterfaces[mode];
+
+  const { modalConfig, showModal, closeModal } = useModal();
 
   const [values, setValues] = useState({ nome: "", email: "", senha: "" });
 
@@ -15,9 +19,15 @@ function AuthPage({ mode }) {
 
   const handleAction = async (e) => {
     e.preventDefault();
-    const success = await config.onSubmit(values);
-    if (success && mode === "register") navigate("/login");
-    if (success && mode === "login") window.location.href = "/";
+
+    const success = await config.onSubmit(values, showModal);
+
+    if (success) {
+      setTimeout(() => {
+        if (mode === "register") navigate("/login");
+        if (mode === "login") window.location.href = "/";
+      }, 1500);
+    }
   };
 
   return (
@@ -60,6 +70,8 @@ function AuthPage({ mode }) {
       <button onClick={() => navigate(config.path)} className="btn-switch">
         {config.switchText}
       </button>
+
+      <Modal config={modalConfig} onClose={closeModal} />
     </div>
   );
 }
