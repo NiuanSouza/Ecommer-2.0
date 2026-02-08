@@ -3,7 +3,15 @@ const bcrypt = require('bcryptjs');
 
 async function seedLarge() {
   try {
-    // 1. Criar/Obter um Vendedor para os produtos
+    console.log("🧹 Limpando dados existentes...");
+
+    // Remove itens do carrinho e produtos para evitar erros de chave estrangeira
+    await db.query('DELETE FROM ecommerce.CarrinhoItem');
+    await db.query('DELETE FROM ecommerce.PedidoItem');
+    await db.query('DELETE FROM ecommerce.Pedido');
+    await db.query('DELETE FROM ecommerce.Produto');
+    await db.query('DELETE FROM ecommerce.Categoria');
+
     const hash = await bcrypt.hash('123456', 10);
     const userRes = await db.query(`
       INSERT INTO ecommerce.Usuario (nome, email, senha, tipo) 
@@ -12,10 +20,10 @@ async function seedLarge() {
       RETURNING id`,
       ['Vendedor Premium', 'vendedor_vendas@ecom.com', hash, 'vendedor']
     );
+
     const sellerId = userRes.rows[0].id;
     console.log("✅ Vendedor vinculado.");
 
-    // 2. Criar Categorias diversas
     const categories = ['Eletrônicos', 'Moda', 'Casa & Decoração', 'Esportes', 'Beleza'];
     const catIds = [];
     for (const catName of categories) {
@@ -27,22 +35,33 @@ async function seedLarge() {
     }
     console.log("✅ Categorias configuradas.");
 
-    // 3. Gerador de Produtos
     const adjetivos = ['Premium', 'Ultra', 'Pro', 'Básico', 'Elegante', 'Moderno', 'Clássico', 'Slim', 'Master', 'Sport', 'Vintage', 'Edição Limitada'];
-    const substantivos = ['Fone', 'Relógio', 'Camiseta', 'Tênis', 'Mochila', 'Luminária', 'Cadeira', 'Teclado', 'Mouse', 'Perfume', 'Monitor', 'Smartphone'];
+    const substantivos = [
+      { nome: 'Fone', keyword: 'headphone' },
+      { nome: 'Relógio', keyword: 'watch' },
+      { nome: 'Camiseta', keyword: 'tshirt' },
+      { nome: 'Tênis', keyword: 'sneakers' },
+      { nome: 'Mochila', keyword: 'backpack' },
+      { nome: 'Luminária', keyword: 'lamp' },
+      { nome: 'Cadeira', keyword: 'chair' },
+      { nome: 'Teclado', keyword: 'keyboard' },
+      { nome: 'Mouse', keyword: 'mouse' },
+      { nome: 'Perfume', keyword: 'perfume' },
+      { nome: 'Monitor', keyword: 'monitor' },
+      { nome: 'Smartphone', keyword: 'phone' }
+    ];
 
     console.log("📦 Inserindo 200 produtos...");
     for (let i = 1; i <= 200; i++) {
       const adj = adjetivos[Math.floor(Math.random() * adjetivos.length)];
-      const sub = substantivos[Math.floor(Math.random() * substantivos.length)];
+      const subObj = substantivos[Math.floor(Math.random() * substantivos.length)];
 
-      const nome = `${sub} ${adj} - Modelo #${1000 + i}`;
+      const nome = `${subObj.nome} ${adj} - Modelo #${1000 + i}`;
       const preco = (Math.random() * (1200 - 20) + 20).toFixed(2);
       const estoque = Math.floor(Math.random() * 100) + 5;
       const idCat = catIds[Math.floor(Math.random() * catIds.length)];
 
-      // Imagem aleatória mas consistente usando o ID como semente
-      const img = `https://picsum.photos/seed/${i + 50}/600/600`;
+      const img = `https://loremflickr.com/600/600/${subObj.keyword}?lock=${i}`;
       const desc = `Este é o ${nome}. Um produto de alta qualidade, testado e aprovado para garantir a melhor experiência ao cliente. Ideal para o dia a dia.`;
 
       await db.query(
@@ -55,7 +74,7 @@ async function seedLarge() {
       if (i % 50 === 0) console.log(`> ${i} produtos inseridos...`);
     }
 
-    console.log("⭐ FINALIZADO: 200 produtos prontos para o seu portfólio!");
+    console.log("⭐ FINALIZADO: Banco resetado e 200 novos produtos inseridos!");
     process.exit();
   } catch (err) {
     console.error("❌ Erro no seed:", err.message);

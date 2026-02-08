@@ -9,7 +9,6 @@ const CompraController = require("./controllers/CompraController");
 const authMiddleware = require("./middlewares/auth");
 
 // --- USUÁRIOS ---
-// Corrigido: Cadastro usa .store
 routes.post("/usuarios", UsuarioController.store);
 routes.post("/login", UsuarioController.login);
 routes.get("/usuarios", authMiddleware, UsuarioController.index);
@@ -26,6 +25,6 @@ routes.post("/carrinho", authMiddleware, CarrinhoController.add);
 routes.delete("/carrinho/:id_usuario/:id_produto", authMiddleware, CarrinhoController.delete);
 
 // --- COMPRAS ---
-routes.post("/compras", authMiddleware, CompraController.store);
+routes.post("/compras", CompraController.store);
 
 module.exports = routes;

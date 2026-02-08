@@ -62,6 +62,32 @@ function Cart() {
     }
   };
 
+  const handleFinalizarCompra = async () => {
+    const userStorage = localStorage.getItem("@Ecommerce:user");
+    if (!userStorage) return;
+
+    const { id, token } = JSON.parse(userStorage);
+
+    try {
+      const response = await api.post(
+        "/compras",
+        { id_usuario_comprador: id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      alert(response.data.message || "Compra realizada com sucesso!");
+      window.dispatchEvent(new Event("carrinhoAtualizado"));
+      navigate("/");
+    } catch (error) {
+      console.error("Erro na compra:", error.response?.data);
+      alert(error.response?.data?.error || "Erro ao processar o pedido.");
+    }
+  };
+
   const total = produtos.reduce((acc, p) => acc + p.preco * p.quantidade, 0);
 
   if (loading) return <div className="loader">Carregando...</div>;
@@ -83,7 +109,6 @@ function Cart() {
             </div>
 
             <div className="qty-controls" onClick={(e) => e.stopPropagation()}>
-              ={" "}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -118,17 +143,7 @@ function Cart() {
       </div>
       <div className="cart-summary">
         <h3>Total: R$ {total.toFixed(2)}</h3>
-        <button
-          className="checkout-btn"
-          onClick={() =>
-            api
-              .post("/compras", { id_usuario_comprador: getUserId() })
-              .then(() => {
-                alert("Sucesso!");
-                navigate("/");
-              })
-          }
-        >
+        <button className="checkout-btn" onClick={handleFinalizarCompra}>
           Finalizar
         </button>
       </div>
