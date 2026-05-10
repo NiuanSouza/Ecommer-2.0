@@ -3,22 +3,12 @@ import { Link } from "react-router-dom";
 import Account from "./Profile/Profile.jsx";
 import CartIcon from "./CartIcon/CartIcon.jsx";
 import SearchBar from "./SearchBar/SearchBar.jsx";
-import React from "react";
+import React, { useContext } from "react";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 import "./Header.css";
 
-function Header({
-  busca,
-  setBusca,
-  idUsuarioLogado,
-  usuarios = [],
-  setIdUsuarioLogado,
-}) {
-  // Proteção para evitar erro de .find caso o array ainda não exista
-  const usuarioLogado = Array.isArray(usuarios)
-    ? usuarios.find((u) => String(u.id) === String(idUsuarioLogado))
-    : null;
-
+function Header({ busca, setBusca }) {
   return (
     <header className="main-header">
       <section className="header-topbar">
@@ -40,13 +30,7 @@ function Header({
 
           <div className="header-actions">
             <CartIcon />
-
-            <Account
-              usuarioLogado={usuarioLogado}
-              usuarios={usuarios}
-              idUsuarioLogado={idUsuarioLogado}
-              setIdUsuarioLogado={setIdUsuarioLogado}
-            />
+            <Account />
           </div>
         </div>
       </section>

@@ -8,6 +8,7 @@ import Cart from "./pages/Cart/Cart.jsx";
 import AuthPage from "./pages/Auth/AuthPage";
 import Profile from "./pages/Profile/ProfilePage.jsx";
 import Orders from "./pages/Orders/Orders";
+import { AuthProvider } from "./contexts/AuthContext.jsx";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 );
