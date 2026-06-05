@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 import { authInterfaces } from "./authInterfaces";
 import "./Auth.css";
 import { useModal } from "../../hooks/useModal";
@@ -13,6 +14,8 @@ function AuthPage({ mode }) {
 
   const [values, setValues] = useState({ nome: "", email: "", senha: "" });
 
+  const { login } = useContext(AuthContext);
+
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
@@ -20,12 +23,12 @@ function AuthPage({ mode }) {
   const handleAction = async (e) => {
     e.preventDefault();
 
-    const success = await config.onSubmit(values, showModal);
+    const success = await config.onSubmit(values, showModal, login);
 
     if (success) {
       setTimeout(() => {
         if (mode === "register") navigate("/login");
-        if (mode === "login") window.location.href = "/";
+        if (mode === "login") navigate("/");
       }, 1500);
     }
   };

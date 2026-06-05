@@ -8,7 +8,7 @@ export const authInterfaces = {
     switchText: "Não tem uma conta? Registre-se.",
     path: "/register",
     fields: ["email", "senha"],
-    onSubmit: async (data, showModal) => {
+    onSubmit: async (data, showModal, login) => {
       try {
         const response = await api.post("/login", {
           email: data.email,
@@ -16,10 +16,7 @@ export const authInterfaces = {
         });
 
         if (response.data.token) {
-          localStorage.setItem("@Ecommerce:token", response.data.token);
-          localStorage.setItem("@Ecommerce:user", JSON.stringify(response.data.user));
-
-          api.defaults.headers.Authorization = `Bearer ${response.data.token}`;
+          login(response.data.user, response.data.token);
 
           showModal(`Bem-vindo, ${response.data.user.nome}!`, "success");
           return true;

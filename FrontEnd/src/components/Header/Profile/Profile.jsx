@@ -1,17 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "./Profile.css";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
-import api from "../../../../src/services/api";
+import { AuthContext } from "../../../contexts/AuthContext.jsx";
 
 function Profile() {
   const navigate = useNavigate();
   const [dropdownAberto, setDropdownAberto] = useState(false);
-
-  const [usuario, setUsuario] = useState(() => {
-    const userStorage = localStorage.getItem("@Ecommerce:user");
-    return userStorage ? JSON.parse(userStorage) : null;
-  });
+  const { usuarioLogado: usuario, logout } = useContext(AuthContext);
 
   const formatarNomeExibicao = (nome) => {
     if (!nome) return "";
@@ -21,13 +17,9 @@ function Profile() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("@Ecommerce:token");
-    localStorage.removeItem("@Ecommerce:user");
-    delete api.defaults.headers.Authorization;
-    setUsuario(null);
+    logout();
     setDropdownAberto(false);
     navigate("/");
-    window.location.reload();
   };
 
   return (
